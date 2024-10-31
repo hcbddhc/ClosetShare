@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import LoginScreen from './src/LoginScreen';  // Updated path
-import HomeScreen from './src/HomeScreen';    // Adjust if HomeScreen is also under src
+import LoginScreen from './src/LoginScreen';  
+import HomeScreen from './src/HomeScreen';    
 
 const Stack = createStackNavigator();
 
