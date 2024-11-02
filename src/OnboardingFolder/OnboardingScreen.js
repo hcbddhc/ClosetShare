@@ -5,6 +5,7 @@ import { View, Text, StyleSheet, FlatList, Animated } from 'react-native';
 import Slides from './Slides';
 import OnboardingItem from './OnboardingItem';
 import Paginator from './Paginator';
+import NextButton from './NextButton';
 
 const OnboardingScreen = () => {
   const [currentIndex, setCurrentIndex] =useState(0);
@@ -16,6 +17,12 @@ const OnboardingScreen = () => {
   }).current;
 
   const viewConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
+
+  const scrollToNext = () => {
+    if (currentIndex < Slides.length - 1) {
+      slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -38,6 +45,7 @@ const OnboardingScreen = () => {
         />
       </View>
 
+      <NextButton scrollTo={scrollToNext} />
       <Paginator data={Slides} scrollX={scrollX}/>
     </View>
   )
