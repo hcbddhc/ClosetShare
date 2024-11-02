@@ -4,6 +4,10 @@ import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth } from './firebaseConfig'; 
 
+//firestore database related.
+import { db } from './firebaseConfig'; //import to gain access to Firestore so we can interact with it
+import { doc, setDoc } from 'firebase/firestore'; //allow us to access, reference, create, etc documents on firestore database
+
 const LoginScreen = ({ navigation }) => {
 
   // initialize authentication from firebase
@@ -31,7 +35,15 @@ const LoginScreen = ({ navigation }) => {
   //sign up function
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword( auth, email, password);
+      //set up variables that will be saved to database when signing up
+      const userCredential = await createUserWithEmailAndPassword( auth, email, password);
+      const uid = userCredential.user.uid;
+      await setDoc(doc(db, 'users', uid), { //current path users -> uid -> height/weight/gender, can change later
+        height: '', 
+        gender: '',
+        weight: ''
+      }); //set up empty values for user height gender and weight, we can modify it in signup when we add onboarding.
+
       console.log('sign up successful');
       alert("Sign up success. User: " + email + " signed up.");
       navigation.navigate('Home'); // Navigate to Home screen on successful sign-up
