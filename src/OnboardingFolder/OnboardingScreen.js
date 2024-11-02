@@ -7,7 +7,7 @@ import OnboardingItem from './OnboardingItem';
 import Paginator from './Paginator';
 import NextButton from './NextButton';
 
-const OnboardingScreen = () => {
+const OnboardingScreen = ({navigation}) => {
   const [currentIndex, setCurrentIndex] =useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const slidesRef = useRef(null);
@@ -21,6 +21,8 @@ const OnboardingScreen = () => {
   const scrollToNext = () => {
     if (currentIndex < Slides.length - 1) {
       slidesRef.current.scrollToIndex({ index: currentIndex + 1 });
+    } else {
+      navigation.navigate('Login'); // Navigate to LoginScreen when on the last slide
     }
   };
 
@@ -35,6 +37,7 @@ const OnboardingScreen = () => {
           keyExtractor={(item) => item.id}
           showsHorizontalScrollIndicator={false}
           bounces={false}
+          scrollEnabled
           onScroll={Animated.event([{ nativeEvent: { contentOffset: {x: scrollX } } }], {
             useNativeDriver:false,
           })}
