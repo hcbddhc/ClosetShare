@@ -1,52 +1,27 @@
 // src/LoginScreen.js
 import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { firebase_auth } from './firebaseConfig'; 
+import { firebase_auth } from './firebaseConfig';
+import Input from './components/Input'; 
+import DefaultButton from './components/DefaultButton'; 
 
 //firestore database related.
 import { db } from './firebaseConfig'; //import to gain access to Firestore so we can interact with it
 import { doc, setDoc } from 'firebase/firestore'; //allow us to access, reference, create, etc documents on firestore database
 
 const LoginScreen = ({ navigation }) => {
-
-  // initialize authentication from firebase
   const auth = firebase_auth;
 
-  // State variables to track email and password inputs
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // State variable for error messages
   const [error, setError] = useState(null);
 
-//login function
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log('login successful');
       alert("Log in success. User: " + email + " logged in.");
-      navigation.navigate('Home'); // Navigate to Home screen on successful login
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  //sign up function
-  const handleSignUp = async () => {
-    try {
-      //set up variables that will be saved to database when signing up
-      const userCredential = await createUserWithEmailAndPassword( auth, email, password);
-      const uid = userCredential.user.uid;
-      await setDoc(doc(db, 'users', uid), { //current path users -> uid -> height/weight/gender, can change later
-        height: '', 
-        gender: '',
-        weight: ''
-      }); //set up empty values for user height gender and weight, we can modify it in signup when we add onboarding.
-
-      console.log('sign up successful');
-      alert("Sign up success. User: " + email + " signed up.");
-      navigation.navigate('Home'); // Navigate to Home screen on successful sign-up
+      navigation.navigate('Home');
     } catch (err) {
       setError(err.message);
     }
@@ -54,31 +29,100 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
+      <Image source={require('../assets/loginScreenImages/LoginImage_01.png')} style={styles.image} />
+      <Text style={styles.title}>Welcome Back!</Text>
+      <Text style={styles.subtitle}>Log in to continue your style journey.</Text>
+      
+      <Input label="Email" placeholder="E.g. user123@mail.com" value={email} onChangeText={setEmail} />
+      <Input label="Password" placeholder="E.g. User123*" value={password} onChangeText={setPassword} secureTextEntry />
+      
       {error && <Text style={styles.error}>{error}</Text>}
-      <Button title="Login" onPress={handleLogin} />
-      <Button title="Sign Up" onPress={handleSignUp} />
+      
+      <View style={styles.buttonRow}>
+        <DefaultButton title="Login" onPress={handleLogin} />
+        <DefaultButton title="Sign up" onPress={() => navigation.navigate('Signup')} />
+      </View>
+
+      <Text style={styles.orText}>Or login with</Text>
+      
+      <View style={styles.socialIconsContainer}>
+        {/* Placeholder for social login buttons */}
+        <TouchableOpacity style={styles.socialIcon}><Text>F</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.socialIcon}><Text>G</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.socialIcon}><Text>A</Text></TouchableOpacity>
+      </View>
+
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.skipText}>Skip for now</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 16 },
-  input: { marginBottom: 12, padding: 8, borderWidth: 1, borderColor: '#ddd' },
-  error: { color: 'red', marginBottom: 12 },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+  },
+  image: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'contain',
+    marginVertical: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  error: {
+    color: 'red',
+    marginBottom: 12,
+  },
+  orText: {
+    fontSize: 16,
+    color: '#666',
+    marginVertical: 20,
+    textAlign: 'center',
+  },
+  socialIconsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '60%',
+    marginBottom: 20,
+  },
+  socialIcon: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#eee',
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skipText: {
+    fontSize: 16,
+    color: '#333',
+    marginTop: 20,
+    textDecorationLine: 'underline',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%', // Adjust width as needed
+    marginBottom: 20,
+  },
 });
 
 export default LoginScreen;
+
 
