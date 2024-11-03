@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import { Pressable, Text, StyleSheet, Animated } from 'react-native';
 
-const DefaultButton = ({ title, onPress }) => {
+const DefaultButton = ({ title, onPress, style }) => {
   const animatedOpacity = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -27,7 +27,7 @@ const DefaultButton = ({ title, onPress }) => {
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
     >
-      <Animated.View style={[styles.button, { opacity: animatedOpacity }]}>
+      <Animated.View style={[styles.button, style, { opacity: animatedOpacity }]}>
         <Text style={styles.buttonText}>{title}</Text>
       </Animated.View>
     </Pressable>

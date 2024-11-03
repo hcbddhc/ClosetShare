@@ -51,6 +51,7 @@ const OnboardingScreen = ({navigation}) => {
       <DefaultButton 
         title={currentIndex === Slides.length - 1 ? "Get Started" : "Next"} // it will changed the text to Get Started when reached to the last slide.
         onPress={scrollToNext} 
+        style={styles.customButton} 
       />
       <Paginator data={Slides} scrollX={scrollX}/>
     </View>
@@ -63,6 +64,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor:'#fff',
+  },
+  customButton: {
+    width: 250,  // Custom width for the button
   },
 });
 

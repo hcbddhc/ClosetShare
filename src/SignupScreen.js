@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth } from './firebaseConfig';
-import Input from './components/Input'; // Assuming Input.js is in components folder
-import DefaultButton from './components/DefaultButton'; // Assuming DefaultButton.js is in components folder
+import Input from './components/Input'; 
+import DefaultButton from './components/DefaultButton'; 
 
 const SignupScreen = ({ navigation }) => {
   const auth = firebase_auth;
