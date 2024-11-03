@@ -18,7 +18,7 @@ const Input = ({ label, placeholder, ...props }) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: '80%',
     marginVertical: 10,
   },
   label: {
