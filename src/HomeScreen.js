@@ -17,11 +17,16 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
+
+       {/* Header */}
       <View style= {styles.header}>
         <Text style={styles.logo}>CLOSET SHARE.</Text>
-        <Text style={styles.caption}>search......</Text>
-        
-      </View>
+        <View style = {styles.search}>
+
+          <TextInput style={styles.caption} placeholder="search......"/>
+        </View>
+      </View>{/* Header */}
+      
     </View>
   );
 };
@@ -29,11 +34,25 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
   },
-  logo: {
-    fontFamily: 'Poppins_700Bold', // Apply the loaded font here
-    fontSize: 14,
-    color: '#8A2BE2', // Adjust the color as needed
+  header: {
+    backgroundColor: '#FFFFFF',
+    paddingTop: 56,
+    paddingBottom: 10,
   },
+
+  logo: {
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 14,
+    color: '#9D4EDD', 
+  },
+  search: {
+    marginLeft: 22,
+    marginRight: 22,
+    padding: 4,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 15,
+
+  }
 });
 
 export default HomeScreen;
