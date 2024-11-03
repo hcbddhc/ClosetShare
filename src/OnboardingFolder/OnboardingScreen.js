@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, FlatList, Animated } from 'react-native';
 import Slides from './Slides';
 import OnboardingItem from './OnboardingItem';
 import Paginator from './Paginator';
-import NextButton from './NextButton';
+import DefaultButton from '../components/DefaultButton';
 
 const OnboardingScreen = ({navigation}) => {
   const [currentIndex, setCurrentIndex] =useState(0);
@@ -48,7 +48,10 @@ const OnboardingScreen = ({navigation}) => {
         />
       </View>
 
-      <NextButton scrollTo={scrollToNext} />
+      <DefaultButton 
+        title={currentIndex === Slides.length - 1 ? "Get Started" : "Next"} // it will changed the text to Get Started when reached to the last slide.
+        onPress={scrollToNext} 
+      />
       <Paginator data={Slides} scrollX={scrollX}/>
     </View>
   )
