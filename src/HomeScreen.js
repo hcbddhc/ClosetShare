@@ -54,23 +54,40 @@ const HomeScreen = () => {
       </View>
       
       {/* ------------------------------------------Content------------------------------------------------------- */}
+      <View style= {styles.content}></View>
 
       {/* ------------------------------------------Footer------------------------------------------------------- */}
+      <View style= {styles.footer}>
+        <Pressable style={styles.footerOption}>
+          <Image source={require('../assets/HomeScreenImages/Home Icon.png')} style={styles.footerIcon} />
+          <Text style={styles.footerText}>Home</Text>
+        </Pressable>
+        <Pressable style={styles.footerOption}>
+          <Image source={require('../assets/HomeScreenImages/Post Icon.png')} style={styles.footerIcon} />
+          <Text style={styles.footerText}>Post</Text>
+        </Pressable>
+        <Pressable style={styles.footerOption}>
+          <Image source={require('../assets/HomeScreenImages/Profile Icon.png')} style={styles.footerIcon} />
+          <Text style={styles.footerText}>Profile</Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
   },
+
+
   header: {
     backgroundColor: '#FFFFFF',
     paddingTop: 56,
     paddingBottom: 10,
     paddingLeft: 22,
   },
-
-  logo: {
+  logo: { 
     fontFamily: 'Poppins_700Bold',
     fontSize: 20,
     color: '#9D4EDD', 
@@ -85,7 +102,6 @@ const styles = StyleSheet.create({
     padding: 4,
     backgroundColor: '#F0F0F0',
     borderRadius: 15,
-
   },
   searchIcon: {
     marginRight: 10,
@@ -114,6 +130,33 @@ const styles = StyleSheet.create({
     height: 15,
     width: 15,
     marginLeft: 5,
+  },
+
+
+  content: {
+    flex: 1
+  },
+
+
+
+
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    paddingHorizontal: '17%',
+    paddingVertical: 10,
+    borderTopWidth: 1, 
+    borderTopColor: '#666363', 
+  },
+  footerOption: {
+    alignItems: 'center',
+  },
+  footerIcon: {
+    width: 32,
+    height: 32,
+    marginBottom: 2,
   }
 });
 
