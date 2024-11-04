@@ -1,16 +1,15 @@
 // src/HomeScreen.js
 import React from 'react';
+import Footer from './components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 
 const HomeScreen = () => {
-  // Load the Poppins font
+  // Load Poppins font
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
   });
-
-  // If fonts haven't loaded yet, return null to render nothing
   if (!fontsLoaded) {
     return null;
   }
@@ -57,20 +56,7 @@ const HomeScreen = () => {
       <View style= {styles.content}></View>
 
       {/* ------------------------------------------Footer------------------------------------------------------- */}
-      <View style= {styles.footer}>
-        <Pressable style={styles.footerOption}>
-          <Image source={require('../assets/HomeScreenImages/Home Icon.png')} style={styles.footerIcon} />
-          <Text style={styles.footerText}>Home</Text>
-        </Pressable>
-        <Pressable style={styles.footerOption}>
-          <Image source={require('../assets/HomeScreenImages/Post Icon.png')} style={styles.footerIcon} />
-          <Text style={styles.footerText}>Post</Text>
-        </Pressable>
-        <Pressable style={styles.footerOption}>
-          <Image source={require('../assets/HomeScreenImages/Profile Icon.png')} style={styles.footerIcon} />
-          <Text style={styles.footerText}>Profile</Text>
-        </Pressable>
-      </View>
+      <Footer />
     </View>
   );
 };
@@ -137,27 +123,6 @@ const styles = StyleSheet.create({
     flex: 1
   },
 
-
-
-
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    paddingHorizontal: '17%',
-    paddingVertical: 10,
-    borderTopWidth: 1, 
-    borderTopColor: '#666363', 
-  },
-  footerOption: {
-    alignItems: 'center',
-  },
-  footerIcon: {
-    width: 32,
-    height: 32,
-    marginBottom: 2,
-  }
 });
 
 export default HomeScreen;
