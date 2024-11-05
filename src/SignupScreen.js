@@ -2,10 +2,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import {doc, setDoc } from 'firebase/firestore';
 import { firebase_auth } from './firebaseConfig';
 import Input from './components/Input'; 
 import DefaultButton from './components/DefaultButton'; 
+
+//firestore database related.
+import { db } from './firebaseConfig'; //import to gain access to Firestore so we can interact with it
+import { doc, setDoc } from 'firebase/firestore'; //allow us to access, reference, create, etc documents on firestore database
 
 const SignupScreen = ({ navigation }) => {
   const auth = firebase_auth;
@@ -21,6 +24,7 @@ const SignupScreen = ({ navigation }) => {
       const userCredential = await createUserWithEmailAndPassword( auth, email, password);
       const uid = userCredential.user.uid;
       await setDoc(doc(db, 'users', uid), { //current path users -> uid -> height/weight/gender, can change later
+        username: username,
         height: '', 
         gender: '',
         weight: ''
