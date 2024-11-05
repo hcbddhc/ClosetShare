@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {doc, setDoc } from 'firebase/firestore';
 import { firebase_auth } from './firebaseConfig';
 import Input from './components/Input'; 
 import DefaultButton from './components/DefaultButton'; 
@@ -16,7 +17,14 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      //set up variables that will be saved to database when signing up
+      const userCredential = await createUserWithEmailAndPassword( auth, email, password);
+      const uid = userCredential.user.uid;
+      await setDoc(doc(db, 'users', uid), { //current path users -> uid -> height/weight/gender, can change later
+        height: '', 
+        gender: '',
+        weight: ''
+      }); //set up empty values for user height gender and weight, we can modify it in signup when we add onboarding.
       alert("Sign up success. Welcome, " + username + "!");
       navigation.navigate('Home');
     } catch (err) {
