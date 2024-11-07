@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     justifyContent:'center',
   },
   title: {
+    fontFamily: 'Poppins_700Bold',
     fontSize: 28,
     fontWeight: '800',
     color: '#493d8a',

@@ -1,6 +1,6 @@
 // src/LoginScreen.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth } from './firebaseConfig';
 import Input from './components/Input'; 
@@ -13,6 +13,7 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const { width } = useWindowDimensions();
 
   const handleLogin = async () => {
     try {
@@ -26,7 +27,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container} enableOnAndroid={true}>
-      <Image source={require('../assets/loginScreenImages/LoginImage_01.png')} style={styles.image} />
+      <Image source={require('../assets/loginScreenImages/LoginImage_01.png')} style={[styles.image, {width, resizeMode:'contain'}]} />
       <Text style={styles.title}>Welcome Back!</Text>
       <Text style={styles.subtitle}>Log in to continue your style journey.</Text>
       
@@ -37,7 +38,7 @@ const LoginScreen = ({ navigation }) => {
       
       <View style={styles.buttonRow}>
         <DefaultButton title="Login" onPress={handleLogin} />
-        <DefaultButton title="Sign up" onPress={() => navigation.navigate('Signup')} />
+        <DefaultButton title="Sign up" onPress={() => navigation.navigate('GetStarted')} />
       </View>
 
       <Text style={styles.orText}>Or login with</Text>
@@ -63,17 +64,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'contain',
+    height: '30%',
     marginVertical: 20,
   },
   title: {
+    fontFamily: 'Poppins_700Bold',
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
+    fontWeight: '800',
+    color: '#493d8a',
     marginBottom: 10,
+    textAlign:'center',
   },
   subtitle: {
     fontSize: 16,
