@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { firebase_auth } from './firebaseConfig';
-import Input from './components/Input'; 
-import DefaultButton from './components/DefaultButton'; 
-import { db } from './firebaseConfig';
+import { firebase_auth } from '../../firebaseConfig';
+import Input from '../../components/Input'; 
+import DefaultButton from '../../components/DefaultButton'; 
+import { db } from '../../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -36,8 +36,8 @@ const SignupScreen = ({ navigation }) => {
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container} enableOnAndroid={true}>
-      <Image source={require('../assets/SignupScreenImage/SignupImage_01.png')} style={styles.image} />
-      <Text style={styles.title}>Register using your email, Google, or Facebook.</Text>
+      <Image source={require('../../../assets/signupScreenImages/SignupImage_01.png')} style={styles.image} />
+      <Text style={styles.title}>Register to store your data securely and access exclusive ClosetShare features.</Text>
       
       <Input label="Username" placeholder="E.g. user123" value={username} onChangeText={setUsername} />
       <Input label="Email" placeholder="E.g. user123@mail.com" value={email} onChangeText={setEmail} />

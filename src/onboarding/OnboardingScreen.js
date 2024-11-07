@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, FlatList, Animated } from 'react-native';
 
 import Slides from './Slides';
 import OnboardingItem from './OnboardingItem';
-import Paginator from './Paginator';
+import Paginator from '../components/Paginator';
 import DefaultButton from '../components/DefaultButton';
 
 const OnboardingScreen = ({navigation}) => {
