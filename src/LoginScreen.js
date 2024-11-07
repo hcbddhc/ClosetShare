@@ -1,14 +1,11 @@
 // src/LoginScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth } from './firebaseConfig';
 import Input from './components/Input'; 
 import DefaultButton from './components/DefaultButton'; 
-
-//firestore database related.
-import { db } from './firebaseConfig'; //import to gain access to Firestore so we can interact with it
-import { doc, setDoc } from 'firebase/firestore'; //allow us to access, reference, create, etc documents on firestore database
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const LoginScreen = ({ navigation }) => {
   const auth = firebase_auth;
@@ -28,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView contentContainerStyle={styles.container} enableOnAndroid={true}>
       <Image source={require('../assets/loginScreenImages/LoginImage_01.png')} style={styles.image} />
       <Text style={styles.title}>Welcome Back!</Text>
       <Text style={styles.subtitle}>Log in to continue your style journey.</Text>
@@ -46,7 +43,6 @@ const LoginScreen = ({ navigation }) => {
       <Text style={styles.orText}>Or login with</Text>
       
       <View style={styles.socialIconsContainer}>
-        {/* Placeholder for social login buttons */}
         <TouchableOpacity style={styles.socialIcon}><Text>F</Text></TouchableOpacity>
         <TouchableOpacity style={styles.socialIcon}><Text>G</Text></TouchableOpacity>
         <TouchableOpacity style={styles.socialIcon}><Text>A</Text></TouchableOpacity>
@@ -55,13 +51,13 @@ const LoginScreen = ({ navigation }) => {
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
         <Text style={styles.skipText}>Skip for now</Text>
       </TouchableOpacity>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#fff',
@@ -118,7 +114,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%', // Adjust width as needed
+    width: '80%',
     marginBottom: 20,
   },
 });

@@ -5,10 +5,9 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { firebase_auth } from './firebaseConfig';
 import Input from './components/Input'; 
 import DefaultButton from './components/DefaultButton'; 
-
-//firestore database related.
-import { db } from './firebaseConfig'; //import to gain access to Firestore so we can interact with it
-import { doc, setDoc } from 'firebase/firestore'; //allow us to access, reference, create, etc documents on firestore database
+import { db } from './firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const SignupScreen = ({ navigation }) => {
   const auth = firebase_auth;
@@ -20,15 +19,14 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignUp = async () => {
     try {
-      //set up variables that will be saved to database when signing up
-      const userCredential = await createUserWithEmailAndPassword( auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
-      await setDoc(doc(db, 'users', uid), { //current path users -> uid -> height/weight/gender, can change later
-        username: username,
-        height: '', 
+      await setDoc(doc(db, 'users', uid), {
+        username,
+        height: '',
         gender: '',
-        weight: ''
-      }); //set up empty values for user height gender and weight, we can modify it in signup when we add onboarding.
+        weight: '',
+      });
       alert("Sign up success. Welcome, " + username + "!");
       navigation.navigate('Home');
     } catch (err) {
@@ -37,7 +35,7 @@ const SignupScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView contentContainerStyle={styles.container} enableOnAndroid={true}>
       <Image source={require('../assets/SignupScreenImage/SignupImage_01.png')} style={styles.image} />
       <Text style={styles.title}>Register using your email, Google, or Facebook.</Text>
       
@@ -54,13 +52,13 @@ const SignupScreen = ({ navigation }) => {
       <TouchableOpacity onPress={() => navigation.navigate('Login')}>
         <Text style={styles.skipText}>Skip for now</Text>
       </TouchableOpacity>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#fff',
@@ -97,3 +95,5 @@ const styles = StyleSheet.create({
 });
 
 export default SignupScreen;
+
+
