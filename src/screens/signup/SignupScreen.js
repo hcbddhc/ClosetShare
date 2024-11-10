@@ -54,25 +54,25 @@ const SignupScreen = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontFamily: 'Poppins_700Bold',
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#493d8a',
-    marginBottom: 10,
-    textAlign:'center',
-  },
-  error: {
-    color: 'red',
-    marginVertical: 10,
-  },
+    container: {
+      flex: 1,
+      padding: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#fff',
+    },
+    title: {
+      fontFamily: 'Poppins_700Bold',
+      fontSize: 28,
+      fontWeight: '800',
+      color: '#493d8a',
+      marginBottom: 10,
+      textAlign:'center',
+    },
+    error: {
+      color: 'red',
+      marginVertical: 10,
+    },
 });
 
 export default SignupScreen;
