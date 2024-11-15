@@ -14,6 +14,52 @@ const HomeScreen = () => {
     return null;
   }
 
+  //placeholder outfits, remove once cloud integration is implemented.
+  const outfits = [
+    {
+      id: '1',
+      outfitName: 'Casual Day Out',
+      username: 'user123',
+      creationDate: '2024-11-01',
+      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),
+    },
+    {
+      id: '2',
+      outfitName: 'Office Chic',
+      username: 'user456',
+      creationDate: '2024-11-02',
+      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),  // Placeholder image URL
+    },
+    {
+      id: '3',
+      outfitName: 'Night Out Glam',
+      username: 'user789',
+      creationDate: '2024-11-03',
+      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),
+    },
+    {
+      id: '4',
+      outfitName: 'Sporty Look',
+      username: 'user321',
+      creationDate: '2024-11-04',
+      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),
+    }
+  ];
+
+   // renders outfit, for now it just renders the templates above.
+   const renderOutfitCards = () => {
+    return outfits.map((outfit) => (
+      <View key={outfit.id} style={styles.outfitCard}>
+        <Image source={outfit.image} style={styles.outfitImage} />
+        <View style={styles.outfitContent}>
+          <Text style={styles.outfitName}>{outfit.outfitName}</Text>
+          <Text style={styles.outfitUserName}>{outfit.username}</Text>
+          <Text style={styles.outfitDate}>{outfit.creationDate}</Text>
+        </View>
+      </View>
+    ));
+  };
+
   return (
     <View style={styles.container}>
 
@@ -53,7 +99,26 @@ const HomeScreen = () => {
       </View>
       
       {/* ------------------------------------------Content------------------------------------------------------- */}
-      <View style= {styles.content}></View>
+      <View style= {styles.content}>
+        {/* Navigation Options */}
+        <View style={styles.contentSelectionContainer}>
+          <Pressable style={styles.contentOption}>
+            <Text style={styles.contentOptionText}>Explore</Text>
+          </Pressable>
+          <Pressable style={styles.contentOption}>
+            <Text style={styles.contentOptionText}>Favorites</Text>
+          </Pressable>
+          <Pressable style={styles.contentOption}>
+            <Text style={styles.contentOptionText}>Nearby</Text>
+          </Pressable>
+        </View>
+
+         {/* Outfits */}
+         <ScrollView contentContainerStyle={styles.outfitContainer}>
+          {renderOutfitCards()}
+        </ScrollView>
+
+      </View>
 
       {/* ------------------------------------------Footer------------------------------------------------------- */}
       <Footer />
@@ -122,7 +187,52 @@ const styles = StyleSheet.create({
   content: {
     flex: 1
   },
-
+  contentSelectionContainer: {
+    flexDirection: "row",
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    paddingBottom: 10,
+  },
+  contentOption: {
+    marginHorizontal: '6%',
+  },
+  contentOptionText: {
+    fontSize: 16,
+  },
+  outfitContainer: {
+    flexGrow: 1, // Ensures the content can grow and overflow
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    marginHorizontal: 22,
+  },
+  outfitCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    width: '46%',
+    marginBottom: 20,
+  },
+  outfitImage: {
+    width: '100%',
+  },
+  outfitContent: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+  },
+  outfitName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  outfitUserName: {
+    color: '#9D4EDD',
+    marginBottom: 20,
+  },
+  outfitDate: {
+    color: '#666363',
+  },
 });
 
 export default HomeScreen;
