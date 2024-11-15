@@ -1,11 +1,11 @@
 // src/HomeScreen.js
 import React from 'react';
-import Footer from './components/Footer';
+import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 
-const HomeScreen = () => {
+const HomeScreen = (navigation) => {
   // Load Poppins font
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
@@ -21,28 +21,28 @@ const HomeScreen = () => {
       outfitName: 'Casual Day Out',
       username: 'user123',
       creationDate: '2024-11-01',
-      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),
+      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),
     },
     {
       id: '2',
       outfitName: 'Office Chic',
       username: 'user456',
       creationDate: '2024-11-02',
-      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),  // Placeholder image URL
+      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),  // Placeholder image URL
     },
     {
       id: '3',
       outfitName: 'Night Out Glam',
       username: 'user789',
       creationDate: '2024-11-03',
-      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),
+      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),
     },
     {
       id: '4',
       outfitName: 'Sporty Look',
       username: 'user321',
       creationDate: '2024-11-04',
-      image: require('../assets/HomeScreenImages/OutfitTemplate.png'),
+      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),
     }
   ];
 
@@ -70,29 +70,29 @@ const HomeScreen = () => {
 
         {/* Search Bar */}
         <View style = {styles.search}>
-          <Image style={styles.searchIcon} source={require('../assets/HomeScreenImages/Search Icon.png')} />
+          <Image style={styles.searchIcon} source={require('../../assets/HomeScreenImages/Search Icon.png')} />
           <TextInput style={styles.caption} placeholder="search......"/>
         </View>
 
         {/* Filter bar */}
         <View style = {styles.filter}>
-          <Pressable style={styles.filterIcon}><Image source={require('../assets/HomeScreenImages/Filter Icon.png')}/></Pressable>
+          <Pressable style={styles.filterIcon}><Image source={require('../../assets/HomeScreenImages/Filter Icon.png')}/></Pressable>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptionsContainer}>
             <Pressable style={styles.filterOption}>
               <Text style={styles.filterText}>Gender</Text>
-              <Image source={require('../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
+              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
             </Pressable>
             <Pressable style={styles.filterOption}>
               <Text style={styles.filterText}>Height</Text>
-              <Image source={require('../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
+              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
             </Pressable>
             <Pressable style={styles.filterOption}>
               <Text style={styles.filterText}>Season</Text>
-              <Image source={require('../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
+              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
             </Pressable>
             <Pressable style={styles.filterOption}>
               <Text style={styles.filterText}>Body Type</Text>
-              <Image source={require('../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
+              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
             </Pressable>
           </ScrollView>
         </View>

@@ -3,8 +3,9 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'; 
 import LoginScreen from './src/LoginScreen';
-import HomeScreen from './src/HomeScreen';
+import HomeScreen from './src/screens/HomeScreen';
 import OnboardingScreen from './src/onboarding/OnboardingScreen';
+import OutfitCreationScreen from './src/screens/OutfitCreationScreen';
 
 // Import signup screens
 import GetStarted from './src/screens/signup/GetStarted';
@@ -18,7 +19,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Onboarding">
         <Stack.Screen name="Onboarding" options={{ headerShown: false }} component={OnboardingScreen} />
         <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
         
@@ -30,6 +31,7 @@ export default function App() {
         <Stack.Screen name="Signup" options={{ headerShown: false }} component={SignupScreen} />
         
         <Stack.Screen name="Home" options={{ headerShown: false }} component={HomeScreen} />
+        <Stack.Screen name="OutfitCreation" options={{ headerShown: false }} component={OutfitCreationScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
