@@ -2,9 +2,17 @@ import React, { useState} from 'react';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
+//firebase stuff
+import { doc, collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig'; 
+
 
 
 const OutfitCreationScreen = () => {
+
+  const [outfitName, setOutfitName] = useState(null);
+  const [outfitDescription, setOutfitDescription] = useState(null);
+  const [outfitHeight, setOutfitHeight] = useState(null);
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const categorySelection = [
@@ -46,6 +54,27 @@ const OutfitCreationScreen = () => {
     setPieces(updatedPieces);
   };
 
+  const postOutfit = async () => {
+    const outfit = {
+      name: outfitName,
+      description: outfitDescription,
+      height: outfitHeight,
+      category: selectedCategory,
+      bodyType: selectedBodyType,
+      season: selectedSeason,
+      pieces: pieces,
+    };
+
+    try {
+      const uid = 'qqFTdco7K4Ofob5i0wJaBr5cEoQ2'; // Replace with dynamic UID later
+      const userOutfitsRef = collection(doc(db, 'users', uid), 'outfits');
+      await addDoc(userOutfitsRef, outfit);
+      console.log('Outfit saved to Firestore:', outfit);
+    } catch (error) {
+      console.error('Error saving outfit:', error);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
 
@@ -55,6 +84,9 @@ const OutfitCreationScreen = () => {
           <Image source={require('../../assets/outfitCreationImages/back button.png')}/>
         </Pressable>
         <Text style={styles.h1}>Create Outfit</Text>
+        <Pressable onPress = {postOutfit} style={styles.postButton}>
+          <Text style={styles.postButtonText}>Post</Text>
+        </Pressable>
       </View>
 
 {/* ----------------------------outfit Image------------------------------*/}
@@ -78,20 +110,35 @@ const OutfitCreationScreen = () => {
         {/* --------Outfit Name Field----------*/}
         <View style={styles.inputRow}>
           <Text style={styles.captionText}>Outfit Name</Text>
-          <TextInput style={styles.inputText} placeholder="Pick a name for this outfit......"></TextInput>
+          <TextInput
+            style={styles.inputText}
+            placeholder="Pick a name for this outfit......"
+            value={outfitName} 
+            onChangeText={setOutfitName} 
+          />
         </View>
 
         {/* --------Description Field----------*/}
         <View style={styles.inputRow}>
           <Text style={styles.captionText}>Description</Text> 
-          <TextInput style={styles.inputText} placeholder="Write a Description Here"></TextInput>
+          <TextInput
+            style={styles.inputText}
+            placeholder="Write a Description Here......"
+            value={outfitDescription} 
+            onChangeText={setOutfitDescription} 
+          />
         </View>
 
         {/* --------Height + Category Field----------*/}
         <View style={[styles.inputRow, styles.flexRow]} >
           <View style={styles.rowItem}>
             <Text style={styles.captionText}>Height</Text>
-            <TextInput style={styles.inputText} placeholder="Add Height......"></TextInput>
+            <TextInput
+              style={styles.inputText}
+              placeholder="Add Height......"
+              value={outfitHeight} 
+              onChangeText={setOutfitHeight} 
+            />
           </View>
           <View style={styles.rowItem}>
             <Text style={styles.captionText}>Category</Text>
@@ -216,6 +263,17 @@ const styles = StyleSheet.create({
     },
     outfitImage: {
       marginRight: 10,  
+    },
+    postButton: {
+      backgroundColor: '#9D4ECC',
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      alignContent: 'center',
+      justifycontent: 'center',
+    },
+    postButtonText: {
+      color: 'white',
+      fontSize: 20,
     },
     content: {
       marginHorizontal: 30,
