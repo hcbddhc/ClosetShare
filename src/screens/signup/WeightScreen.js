@@ -11,12 +11,12 @@ const WeightScreen = ({ navigation, route }) => {
 
     const handleNext = () => {
         if (weight) {
-            navigation.navigate('Signup', { gender, height, weight });
+          navigation.navigate('LocationPermission', { gender, height, weight });
         } else {
-            alert("Please enter your weight.");
+          alert('Please enter your weight.');
         }
     };
-
+      
     return (
     <View style={styles.container}>
         <Text style={styles.title}>What’s your Weight?</Text>

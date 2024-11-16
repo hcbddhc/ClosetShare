@@ -11,7 +11,7 @@ import { doc, setDoc } from 'firebase/firestore';
 
 const SignupScreen = ({ navigation, route }) => {
 
-  const { gender, height, weight } = route.params;
+  const { gender, height, weight, location } = route.params;
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +29,9 @@ const SignupScreen = ({ navigation, route }) => {
         gender,
         height,
         weight,
+        location, // Save location data
       });
+      
 
       alert("Sign up successful! Welcome, " + username);
       navigation.navigate('Home');
