@@ -1,3 +1,4 @@
+// src/screens/signup/SetLocationScreen.js
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
@@ -46,7 +47,6 @@ const SetLocationScreen = ({ navigation, route }) => {
       {region && (
         <MapView
           style={styles.map}
-          provider="google" // Specify Google Maps provider
           initialRegion={region}
           onPress={(e) => setLocation(e.nativeEvent.coordinate)}
         >
