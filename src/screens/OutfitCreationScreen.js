@@ -6,9 +6,8 @@ import * as ImageManipulator from 'expo-image-manipulator';
 
 //firebase stuff
 import { doc, collection, addDoc } from 'firebase/firestore';
-import { db, storage } from '../firebaseConfig'; 
-import {ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import * as FileSystem from 'expo-file-system';
+import { db} from '../firebaseConfig';
+import { uploadToImgur, deleteImageFromImgur } from '../imgur';
 
 
 const OutfitCreationScreen = () => {
@@ -31,14 +30,18 @@ const OutfitCreationScreen = () => {
     { label: 'Unisex/Gender Neutral', value: 'unisex'},
   ];
   const bodyTypeSelection = [
-    { label: 'Men', value: 'men' },
-    { label: 'Women', value: 'women' },
-    { label: 'Unisex/Gender Neutral', value: 'unisex'},
+    { label: "Curvy", value: "curvy" },
+    { label: "Slim", value: "slim" },
+    { label: "Athletic", value: "athletic" },
+    { label: "Petite", value: "petite" },
+    { label: "Plus-size", value: "plus-size" },
   ];
   const seasonSelection = [
-    { label: 'Men', value: 'men' },
-    { label: 'Women', value: 'women' },
-    { label: 'Unisex/Gender Neutral', value: 'unisex'},
+    { label: 'Spring', value: 'spring' },
+    { label: 'Summer', value: 'summer' },
+    { label: 'Fall', value: 'fall' },
+    { label: 'Winter', value: 'winter' },
+    { label: 'Year-round', value: 'year-round' },
   ];
 
   //function for camera integration
@@ -98,71 +101,72 @@ const OutfitCreationScreen = () => {
   //run when post button is pressed, 
   //compile the outfit object from user selection and inputs, and send to database
   const postOutfit = async () => {
-  const uid = 'qqFTdco7K4Ofob5i0wJaBr5cEoQ2'; // TEMPORARY, change to current user UID later
-
-  const outfit = {
-    name: outfitName,
-    description: outfitDescription,
-    height: outfitHeight,
-    category: outfitCategory,
-    bodyType: outfitBodyType,
-    season: outfitSeason,
-    pieces: outfitPieces,
+    const uid = 'qqFTdco7K4Ofob5i0wJaBr5cEoQ2'; // TEMPORARY, change to current user UID later
+    console.log(outfitImages[0]?.uri);  // Ensure there are images before proceeding
+    const outfit = {
+      name: outfitName,
+      description: outfitDescription,
+      height: outfitHeight,
+      category: outfitCategory,
+      bodyType: outfitBodyType,
+      season: outfitSeason,
+      pieces: outfitPieces,
+    };
+  
+    // Ensure valid outfitImages
+    if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
+      console.error("No outfit images provided");
+      return; // Exit early if no images
+    }
+  
+    try {
+      // Map through the outfit images and upload them to Imgur
+      const imgurData = await Promise.all(
+        outfitImages.map(async (image) => {
+          if (!image?.uri) return null; // Skip if no image URI
+  
+          try {
+            // Upload image to Imgur and get the response with both link and deleteHash
+            const imgurResponse = await uploadToImgur(image.uri);
+  
+            // Check if the response contains both link and deleteHash
+            if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
+              const imgurLink = imgurResponse.link;
+              const deleteHash = imgurResponse.deleteHash;
+  
+              console.log(`Image uploaded to Imgur: ${imgurLink}`);
+              return { imageUrl: imgurLink, deleteHash };  // Store image URL and delete hash
+            } else {
+              console.error("Imgur response is missing link or deleteHash", imgurResponse);
+              return null;  // Return null if response is invalid
+            }
+          } catch (error) {
+            console.error('Error uploading image to Imgur:', error);
+            return null;  // Return null if upload fails
+          }
+        })
+      );
+  
+      // Filter out any failed uploads (null values)
+      outfit.images = imgurData.filter((data) => data !== null);
+  
+      if (outfit.images.length === 0) {
+        console.error("No images uploaded to Imgur.");
+        return;  // Exit if no images were successfully uploaded
+      }
+  
+      // Save the outfit data to Firestore with image links and delete hashes
+      const userOutfitsRef = collection(doc(db, "users", uid), "outfits");
+      await addDoc(userOutfitsRef, outfit);
+      console.log("Outfit added successfully!");
+    } catch (error) {
+      console.error("Error during outfit posting: ", error);
+    }
   };
 
-  // Ensure valid outfitImages
-  if (!outfitImages || outfitImages.length === 0) {
-    console.error("No outfit images provided");
-    return; // Exit early if no images
-  }
-
-  try {
-    const imageUrls = await Promise.all(
-      outfitImages.map(async (image, index) => {
-        if (!image?.blob) return null; // Skip if no image blob
-
-        // Generate a unique name for the image
-        const uniqueName = `${Date.now()}_${Math.floor(Math.random() * 1000)}_${index}.jpg`;
-        const path = `users/${uid}/outfits/${uniqueName}`;
-        const imageRef = ref(storage, path);
-
-        try {
-          // Upload the Blob to Firebase Storage
-          await uploadBytes(imageRef, image.blob);
-  
-          // Get the download URL
-          const url = await getDownloadURL(imageRef);
-          console.log(`Image ${index} uploaded: ${url}`);
-          return url;
-        } catch (error) {
-          // Detailed error logging
-          console.error(`Error uploading image ${index}: `, error);
-  
-          if (error.code) {
-            console.log('Error code:', error.code); // Firebase-specific error code
-          }
-          if (error.message) {
-            console.log('Error message:', error.message); // The error message from Firebase
-          }
-          if (error.details) {
-            console.log('Error details:', error.details); // Additional details, if available
-          }
-  
-          return null; // Return null in case of an error
-        }
-      })
-    );
-
-    // Filter out null values (failed uploads) and add the image URLs to the outfit data
-    outfit.images = imageUrls.filter((url) => url !== null);
-
-    // Save the outfit data to Firestore
-    const userOutfitsRef = collection(doc(db, "users", uid), "outfits");
-    await addDoc(userOutfitsRef, outfit);
-    console.log("Outfit added successfully!");
-  } catch (error) {
-    console.error("Error during outfit posting: ", error);
-  }
+const imgurStuff = async () => {
+  await deleteImageFromImgur('uMcZfZPzW1Mneua');
+  await deleteImageFromImgur('uR1aUKelyFcHz9y');
 };
 
   return (
@@ -174,7 +178,7 @@ const OutfitCreationScreen = () => {
           <Image source={require('../../assets/outfitCreationImages/back button.png')}/>
         </Pressable>
         <Text style={styles.h1}>Create Outfit</Text>
-        <Pressable onPress = {postOutfit} style={styles.postButton}>
+        <Pressable onPress = {imgurStuff} style={styles.postButton}>
           <Text style={styles.postButtonText}>Post</Text>
         </Pressable>
       </View>
@@ -283,7 +287,7 @@ const OutfitCreationScreen = () => {
       {/* ----------------------------outfit pieces------------------------------*/}
         <Text style={styles.captionText}>Piece Title</Text>
         {outfitPieces.map((piece, index) => (
-          <View key={outfitPieces.id} style={styles.outfitPiece}>
+          <View key={piece.id} style={styles.outfitPiece}>
 
             <Pressable style={styles.pieceLeft}>
               <Image
