@@ -1,81 +1,57 @@
 // src/HomeScreen.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const HomeScreen = (navigation) => {
-  //placeholder outfits, remove once cloud integration is implemented.
   const [outfits, setOutfits] = useState([]);
-  const outfitsTest = [
-    {
-      id: '1',
-      outfitName: 'Casual Day Out',
-      username: 'user123',
-      creationDate: '2024-11-01',
-      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),
-    },
-    {
-      id: '2',
-      outfitName: 'Office Chic',
-      username: 'user456',
-      creationDate: '2024-11-02',
-      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),  // Placeholder image URL
-    },
-    {
-      id: '3',
-      outfitName: 'Night Out Glam',
-      username: 'user789',
-      creationDate: '2024-11-03',
-      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),
-    },
-    {
-      id: '4',
-      outfitName: 'Sporty Look',
-      username: 'user321',
-      creationDate: '2024-11-04',
-      image: require('../../assets/HomeScreenImages/OutfitTemplate.png'),
-    }
-  ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const usersList = await getDocs(collection(db, 'users'));
-        let fetchedData = [];
-  
-        // Loop through each user document
-        for (const userDoc of usersList.docs) {
-          // Get all outfits for the current user
-          const outfitsList = await getDocs(
-            collection(db, `users/${userDoc.id}/outfits`)
-          );
-  
-          // Process each outfit document
-          outfitsList.forEach((outfitDoc) => {
-            fetchedData.push({
-              id: outfitDoc.id,
-              outfitName: outfitDoc.data().name,
-              username: userDoc.data().username || 'Anonymous', // Fallback
-              creationDate: outfitDoc.data().creationDate || 'Unknown',
-              image: outfitDoc.data().images?.[0]?.imageUrl,
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const usersList = await getDocs(collection(db, 'users'));
+          let fetchedData = [];
+    
+          // Loop through each user document
+          for (const userDoc of usersList.docs) {
+            // Get all outfits for the current user
+            const outfitsList = await getDocs(
+              collection(db, `users/${userDoc.id}/outfits`)
+            );
+    
+            // Process each outfit document
+            outfitsList.forEach((outfitDoc) => {
+              fetchedData.push({
+                id: outfitDoc.id,
+                outfitName: outfitDoc.data().name,
+                username: userDoc.data().username || 'Anonymous', // Fallback
+                creationDate: outfitDoc.data().creationDate || 'Unknown',
+                image: outfitDoc.data().images?.[0]?.imageUrl,
+              });
             });
-            //console.log(outfitDoc.data().images?.[0]?.imageUrl);
-          });
+          }
+    
+          // Once all data is fetched, update the state
+          setOutfits(fetchedData); // Set the outfits state after all data is processed
+        } catch (error) {
+          console.error('Error fetching data:', error);
         }
+      };
+    
+      fetchData();
   
-        // Once all data is fetched, update the state
-        setOutfits(fetchedData); // Set the outfits state after all data is processed
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-  
-    fetchData();
-  }, []);
+      // Optionally, clean up logic if needed (e.g., abort fetches)
+      return () => {
+        // Clean-up code if necessary
+      };
+    }, []) // Dependencies array should be empty or include variables if necessary
+  );
 
   // Load Poppins font
   const [fontsLoaded] = useFonts({
