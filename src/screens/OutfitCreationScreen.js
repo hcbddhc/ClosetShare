@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, Alert, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Import the hook
 
 import { Dropdown } from 'react-native-element-dropdown';
@@ -60,32 +60,62 @@ const OutfitCreationScreen = () => {
   };
 
   //function for camera integration
-  const pickImage = async (imageIndex) => {
-    const permissionGranted = await requestPermissions();
-    if (!permissionGranted) return;
-    
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      allowsEditing: true,
-      aspect: [4, 3],
+  // Function to handle camera or image library selection
+const pickImage = async (imageIndex) => {
+  const permissionGranted = await requestPermissions();
+  if (!permissionGranted) return;
+
+  // Prompt the user to select an option
+  Alert.alert(
+    'Select Source',
+    'Where do you want to upload image from?',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Camera',
+        onPress: async () => {
+          const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+            allowsEditing: true,
+            aspect: [4, 3],
+          });
+          handleImageResult(result, imageIndex);
+        },
+      },
+      {
+        text: 'Image Library',
+        onPress: async () => {
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+            allowsEditing: true,
+            aspect: [4, 3],
+          });
+          handleImageResult(result, imageIndex);
+        },
+      },
+    ]
+  );
+};
+
+// Function to handle the result from either Camera or Library
+const handleImageResult = async (result, imageIndex) => {
+  if (!result.canceled) {
+    const manipulatedImage = await ImageManipulator.manipulateAsync(
+      result.assets[0].uri,
+      [{ resize: { width: 1024 } }], // Resize as needed
+      { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG } // Compress to 40%
+    );
+
+    // Update the state with the manipulated image
+    setOutfitImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[imageIndex] = { uri: manipulatedImage.uri }; // Store the image URI
+      return updatedImages;
     });
-
-    if (!result.canceled) {
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        result.assets[0].uri,
-        [{ resize: { width: 1024 } }], // Resize to whatever you need
-        { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG } // 40% quality
-      );
-
-      // Update the state with the manipulated image as a Blob (instead of URI)
-      setOutfitImages((prevImages) => {
-        const updatedImages = [...prevImages];
-        updatedImages[imageIndex] = { uri: manipulatedImage.uri}; //stores uri
-        return updatedImages;
-      });
-    }
-  };
+  }
+};
 
   //function to add outfit piece to the array
   const addPiece = () => {
