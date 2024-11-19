@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react';
+import React, {useCallback, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
@@ -9,8 +9,19 @@ import { removeData } from '../utils/storage';
 
 
 const HomeScreen = ({ navigation, onLoginStateChange }) => {
+
+  //The variable that stores all the extracted outfits from the database
   const [outfits, setOutfits] = useState([]);
+
+  // Load Poppins font, we should look more into how font works later
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+  });
+  if (!fontsLoaded) {
+    return null;
+  }
   
+  //for logging out
   const handleLogout = async () => {
     console.log('Logout triggered');
     await removeData('user');
@@ -25,7 +36,21 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
     }, 150); // Small delay to allow state updates
   };
   
+   // renders outfit
+   const renderOutfitCards = () => {
+    return outfits.map((outfit) => (
+      <View key={outfit.id} style={styles.outfitCard}>
+        <Image source={{uri: outfit.image}} style={styles.outfitImage}/>
+        <View style={styles.outfitContent}>
+          <Text style={styles.outfitName}>{outfit.outfitName}</Text>
+          <Text style={styles.outfitUserName}>{outfit.username}</Text>
+          <Text style={styles.outfitDate}>{outfit.creationDate}</Text>
+        </View>
+      </View>
+    ));
+  };
 
+  //runs everytime the page is loaded.
   //we should try to merge the two focus effect later
   useFocusEffect(
     React.useCallback(() => {
@@ -68,38 +93,10 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
       };
     
       fetchData();
-  
-      
-      return () => {
-       
+      return () => {   
       };
     }, []) 
   );
-  
-
-  // Load Poppins font, we should look more into how font works later
-  const [fontsLoaded] = useFonts({
-    Poppins_700Bold,
-  });
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  
-
-   // renders outfit
-   const renderOutfitCards = () => {
-    return outfits.map((outfit) => (
-      <View key={outfit.id} style={styles.outfitCard}>
-        <Image source={{uri: outfit.image}} style={styles.outfitImage}/>
-        <View style={styles.outfitContent}>
-          <Text style={styles.outfitName}>{outfit.outfitName}</Text>
-          <Text style={styles.outfitUserName}>{outfit.username}</Text>
-          <Text style={styles.outfitDate}>{outfit.creationDate}</Text>
-        </View>
-      </View>
-    ));
-  };
 
   return (
     <View style={styles.container}>

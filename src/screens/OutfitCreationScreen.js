@@ -14,7 +14,8 @@ import { getData } from '../utils/storage';
 
 
 const OutfitCreationScreen = () => {
-  const navigation = useNavigation();  // Use the hook to get the navigation object
+  //navigation stuff
+  const navigation = useNavigation(); 
 
   // variables, save these to the outfit object later on
   const [outfitName, setOutfitName] = useState(null);
