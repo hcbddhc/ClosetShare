@@ -9,8 +9,30 @@ import { useFocusEffect } from '@react-navigation/native';
 import { removeData } from '../utils/storage';
 
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation, onLoginStateChange }) => {
   const [outfits, setOutfits] = useState([]);
+  
+  const handleLogout = async () => {
+    console.log('Logout triggered');
+    await removeData('user');
+    onLoginStateChange(); // This updates the `isLoggedIn` state in App.js
+  
+    // Log the updated value of `isLoggedIn`
+    setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }, 150); // Small delay to allow state updates
+  };
+  
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('HomeScreen gained focus');
+      onLoginStateChange(); // Ensure the login state is updated dynamically
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -53,16 +75,6 @@ const HomeScreen = ({navigation}) => {
       };
     }, []) // Dependencies array should be empty or include variables if necessary
   );
-
-  const handleLogout = async () => {
-    console.log('Logout triggered');
-    await removeData('user');
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
-  };
-  
   
 
   // Load Poppins font

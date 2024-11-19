@@ -7,8 +7,9 @@ import Input from './components/Input';
 import DefaultButton from './components/DefaultButton'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { saveData } from './utils/storage'; 
+import { useFocusEffect } from '@react-navigation/native';
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation, onLoginStateChange  }) => {
   const auth = firebase_auth;
 
   const [email, setEmail] = useState('');
@@ -17,19 +18,39 @@ const LoginScreen = ({ navigation }) => {
   const { width } = useWindowDimensions();
 
   const handleLogin = async () => {
-    console.log('Login triggered');
     try {
+      console.log('Login triggered');
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const uid = userCredential.user.uid;
   
-      // Save user login info locally
+      // Save user info
       await saveData('user', { uid, email });
+      console.log('User authenticated and data saved:', { uid, email });
   
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); // Reset to Home
-    } catch (err) {
-      setError(err.message);
+      // Trigger login state update in App.js
+      onLoginStateChange();
+  
+      // Navigate to the Home screen
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+      }, 100); // Small delay to allow state updates
+    } catch (error) {
+      console.error('Error logging in:', error.message);
+      // Optionally, display error feedback to the user
     }
   };
+  
+  
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('LoginScreen gained focus');
+      onLoginStateChange(); // Ensure the login state is updated dynamically
+    }, [])
+  );
   
 
   return (

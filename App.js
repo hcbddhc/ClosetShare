@@ -18,40 +18,39 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
 
   const checkLoginStatus = async () => {
-    const user = await getData('user'); // Check if user is logged in
-    setIsLoggedIn(!!user); // Update login state
-    setIsChecking(false); // Stop checking once the status is determined
+    const user = await getData('user');
+    setIsLoggedIn(!!user);
   };
 
   useEffect(() => {
-    checkLoginStatus(); // Run the check on app load
+    checkLoginStatus(); // Check login status on app load
   }, []);
 
-  if (isChecking) {
-    return null; // Optionally render a loading screen here
-  }
-
+  useEffect(() => {
+    console.log('isLoggedIn state:', isLoggedIn);
+  }, [isLoggedIn]);
+  
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {/* {isLoggedIn ? ( */}
+        {isLoggedIn ? (
           <>
             <Stack.Screen
               name="Home"
-              component={HomeScreen}
               options={{ headerShown: false }}
-            />
+            >
+              {(props) => <HomeScreen {...props} onLoginStateChange={checkLoginStatus} />}
+            </Stack.Screen>
             <Stack.Screen
               name="OutfitCreation"
               component={OutfitCreationScreen}
               options={{ headerShown: false }}
             />
           </>
-        {/* ) : ( */}
+        ) : (
           <>
             <Stack.Screen
               name="Onboarding"
@@ -60,9 +59,10 @@ export default function App() {
             />
             <Stack.Screen
               name="Login"
-              component={LoginScreen}
               options={{ headerShown: false }}
-            />
+            >
+              {(props) => <LoginScreen {...props} onLoginStateChange={checkLoginStatus} />}
+            </Stack.Screen>
             <Stack.Screen
               name="GetStarted"
               component={GetStarted}
@@ -99,7 +99,7 @@ export default function App() {
               options={{ headerShown: false }}
             />
           </>
-        
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
