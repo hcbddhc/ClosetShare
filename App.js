@@ -19,7 +19,7 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="OutfitCreation">
+      <Stack.Navigator initialRouteName="Onboarding">
         <Stack.Screen name="Onboarding" options={{ headerShown: false }} component={OnboardingScreen} />
         <Stack.Screen name="Login" options={{ headerShown: false }} component={LoginScreen} />
         

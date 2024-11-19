@@ -11,11 +11,11 @@ const Footer = () => {
         <Image source={require('../../assets/HomeScreenImages/Home Icon.png')} style={styles.footerIcon} />
         <Text style={styles.footerText}>Home</Text>
       </Pressable>
-      <Pressable style={styles.footerOption}>
+      <Pressable style={styles.footerOption} onPress={() => navigation.navigate('OutfitCreation')}>
         <Image source={require('../../assets/HomeScreenImages/Post Icon.png')} style={styles.footerIcon} />
         <Text style={styles.footerText}>Post</Text>
       </Pressable>
-      <Pressable style={styles.footerOption} onPress={() => navigation.navigate('OutfitCreation')}>
+      <Pressable style={styles.footerOption}>
         <Image source={require('../../assets/HomeScreenImages/Profile Icon.png')} style={styles.footerIcon} />
         <Text style={styles.footerText}>Profile</Text>
       </Pressable>

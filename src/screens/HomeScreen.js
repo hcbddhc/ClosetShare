@@ -1,21 +1,16 @@
 // src/HomeScreen.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 
 const HomeScreen = (navigation) => {
-  // Load Poppins font
-  const [fontsLoaded] = useFonts({
-    Poppins_700Bold,
-  });
-  if (!fontsLoaded) {
-    return null;
-  }
-
   //placeholder outfits, remove once cloud integration is implemented.
-  const outfits = [
+  const [outfits, setOutfits] = useState([]);
+  const outfitsTest = [
     {
       id: '1',
       outfitName: 'Casual Day Out',
@@ -46,11 +41,57 @@ const HomeScreen = (navigation) => {
     }
   ];
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const usersList = await getDocs(collection(db, 'users'));
+        let fetchedData = [];
+  
+        // Loop through each user document
+        for (const userDoc of usersList.docs) {
+          // Get all outfits for the current user
+          const outfitsList = await getDocs(
+            collection(db, `users/${userDoc.id}/outfits`)
+          );
+  
+          // Process each outfit document
+          outfitsList.forEach((outfitDoc) => {
+            fetchedData.push({
+              id: outfitDoc.id,
+              outfitName: outfitDoc.data().name,
+              username: userDoc.data().username || 'Anonymous', // Fallback
+              creationDate: outfitDoc.data().creationDate || 'Unknown',
+              image: outfitDoc.data().images?.[0]?.imageUrl,
+            });
+            //console.log(outfitDoc.data().images?.[0]?.imageUrl);
+          });
+        }
+  
+        // Once all data is fetched, update the state
+        setOutfits(fetchedData); // Set the outfits state after all data is processed
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
+
+  // Load Poppins font
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+  });
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  
+
    // renders outfit, for now it just renders the templates above.
    const renderOutfitCards = () => {
     return outfits.map((outfit) => (
       <View key={outfit.id} style={styles.outfitCard}>
-        <Image source={outfit.image} style={styles.outfitImage} />
+        <Image source={{uri: outfit.image}} style={styles.outfitImage}/>
         <View style={styles.outfitContent}>
           <Text style={styles.outfitName}>{outfit.outfitName}</Text>
           <Text style={styles.outfitUserName}>{outfit.username}</Text>
@@ -203,24 +244,27 @@ const styles = StyleSheet.create({
   outfitContainer: {
     flexGrow: 1, // Ensures the content can grow and overflow
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap', // Allow wrapping
+    justifyContent: 'space-between', // Space out items
     paddingTop: 10,
     marginHorizontal: 22,
   },
   outfitCard: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
-    width: '46%',
-    marginBottom: 20,
+    width: '48%', // Adjust the width to fit two items per row (slightly less than half the screen width)
+    height: 264,
+    marginBottom: 15, // Add spacing between rows
   },
   outfitImage: {
     width: '100%',
+    height: 172,
+    borderTopLeftRadius: 8,  // Apply radius to the top-left corner
+    borderTopRightRadius: 8, // Apply radius to the top-right corner
   },
   outfitContent: {
     flex: 1,
     padding: 10,
-    justifyContent: 'center',
   },
   outfitName: {
     fontSize: 14,
