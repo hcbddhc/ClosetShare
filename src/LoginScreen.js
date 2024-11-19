@@ -6,6 +6,7 @@ import { firebase_auth } from './firebaseConfig';
 import Input from './components/Input'; 
 import DefaultButton from './components/DefaultButton'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { saveData } from './utils/storage'; 
 
 const LoginScreen = ({ navigation }) => {
   const auth = firebase_auth;
@@ -16,14 +17,20 @@ const LoginScreen = ({ navigation }) => {
   const { width } = useWindowDimensions();
 
   const handleLogin = async () => {
+    console.log('Login triggered');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Log in success. User: " + email + " logged in.");
-      navigation.navigate('Home');
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+  
+      // Save user login info locally
+      await saveData('user', { uid, email });
+  
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] }); // Reset to Home
     } catch (err) {
       setError(err.message);
     }
   };
+  
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container} enableOnAndroid={true}>

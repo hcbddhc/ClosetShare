@@ -25,10 +25,10 @@ const WeightScreen = ({ navigation, route }) => {
         </Text>
 
         <Input
-        label=""
-        placeholder="Enter weight in kg or lbs"
-        value={weight}
-        onChangeText={setWeight}
+            label=""
+            placeholder="Enter weight in kg or lbs"
+            value={weight}
+            onChangeText={setWeight}
         />
 
         <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />

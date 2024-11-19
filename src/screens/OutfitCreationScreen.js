@@ -10,6 +10,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { doc, collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { uploadToImgur, deleteImageFromImgur } from '../imgur';
+import { getData } from '../utils/storage'; 
 
 
 const OutfitCreationScreen = () => {
@@ -137,63 +138,71 @@ const handleImageResult = async (result, imageIndex) => {
   //run when post button is pressed, 
   //compile the outfit object from user selection and inputs, and send to database
   const postOutfit = async () => {
-    const uid = 'qqFTdco7K4Ofob5i0wJaBr5cEoQ2'; // TEMPORARY, change to current user UID later
-    console.log(outfitImages[0]?.uri);  // Ensure there are images before proceeding
-    const outfit = {
-      name: outfitName,
-      description: outfitDescription,
-      height: outfitHeight,
-      category: outfitCategory,
-      bodyType: outfitBodyType,
-      season: outfitSeason,
-      pieces: outfitPieces,
-    };
-
-    // Ensure valid outfitImages
-    if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
-      console.error("No outfit images provided");
-      return; // Exit early if no images
-    }
-
     try {
+      // Retrieve the logged-in user's uid from AsyncStorage
+      const user = await getData('user');
+      const uid = user?.uid;
+  
+      if (!uid) {
+        console.error("User is not logged in. UID not found.");
+        return;
+      }
+  
+      console.log(outfitImages[0]?.uri); // Ensure there are images before proceeding
+      const outfit = {
+        name: outfitName,
+        description: outfitDescription,
+        height: outfitHeight,
+        category: outfitCategory,
+        bodyType: outfitBodyType,
+        season: outfitSeason,
+        pieces: outfitPieces,
+      };
+  
+      // Ensure valid outfitImages
+      if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
+        console.error("No outfit images provided");
+        return; // Exit early if no images
+      }
+  
       // Map through the outfit images and upload them to Imgur
       const imgurData = await Promise.all(
         outfitImages.map(async (image) => {
           if (!image?.uri) return null; // Skip if no image URI
-
+  
           try {
             // Upload image to Imgur and get the response with both link and deleteHash
             const imgurResponse = await uploadToImgur(image.uri);
-
-            // Check if the response contains both link and deleteHash
+  
             if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
               const imgurLink = imgurResponse.link;
               const deleteHash = imgurResponse.deleteHash;
-
+  
               console.log(`Image uploaded to Imgur: ${imgurLink}`);
-              return { imageUrl: imgurLink, deleteHash };  // Store image URL and delete hash
+              return { imageUrl: imgurLink, deleteHash }; // Store image URL and delete hash
             } else {
               console.error("Imgur response is missing link or deleteHash", imgurResponse);
-              return null;  // Return null if response is invalid
+              return null; // Return null if response is invalid
             }
           } catch (error) {
             console.error('Error uploading image to Imgur:', error);
-            return null;  // Return null if upload fails
+            return null; // Return null if upload fails
           }
         })
       );
-
+  
       // Filter out any failed uploads (null values)
       outfit.images = imgurData.filter((data) => data !== null);
-
+  
       if (outfit.images.length === 0) {
         console.error("No images uploaded to Imgur.");
-        return;  // Exit if no images were successfully uploaded
+        return; // Exit if no images were successfully uploaded
       }
-
-      // Save the outfit data to Firestore with image links and delete hashes
+  
+      // Save the outfit data to Firestore with the user's UID
       const userOutfitsRef = collection(doc(db, "users", uid), "outfits");
       await addDoc(userOutfitsRef, outfit);
+  
       console.log("Outfit added successfully!");
       navigation.navigate('Home');
     } catch (error) {

@@ -7,6 +7,7 @@ import Input from '../../components/Input';
 import DefaultButton from '../../components/DefaultButton';
 import { db } from '../../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
+import { saveData } from '../../utils/storage';
 
 
 const SignupScreen = ({ navigation, route }) => {
@@ -31,7 +32,9 @@ const SignupScreen = ({ navigation, route }) => {
         weight,
         location, // Save location data
       });
-      
+
+      // Save user login info to AsyncStorage
+      await saveData('user', { uid, username, email });
 
       alert("Sign up successful! Welcome, " + username);
       navigation.navigate('Home');

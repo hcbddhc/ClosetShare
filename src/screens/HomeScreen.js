@@ -6,9 +6,10 @@ import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
+import { removeData } from '../utils/storage';
 
 
-const HomeScreen = (navigation) => {
+const HomeScreen = ({navigation}) => {
   const [outfits, setOutfits] = useState([]);
 
   useFocusEffect(
@@ -53,6 +54,17 @@ const HomeScreen = (navigation) => {
     }, []) // Dependencies array should be empty or include variables if necessary
   );
 
+  const handleLogout = async () => {
+    console.log('Logout triggered');
+    await removeData('user');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
+  };
+  
+  
+
   // Load Poppins font
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
@@ -82,8 +94,14 @@ const HomeScreen = (navigation) => {
 
        {/* ------------------------------------------Header------------------------------------------------------- */}
       <View style= {styles.header}>
-        {/* Logo */}
-        <Text style={styles.logo}>CLOSET SHARE.</Text>
+        <View style ={styles.flexIcon}>
+          {/* Logo */}
+          <Text style={styles.logo}>CLOSET SHARE.</Text>
+          <Pressable onPress={handleLogout} style={styles.logoutButton}>
+            <Image style={styles.logoutButtonImage} source={require('../../assets/HomeScreenImages/LogoutIcon.png') } />
+          </Pressable>
+        </View>
+
 
         {/* Search Bar */}
         <View style = {styles.search}>
@@ -148,6 +166,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  flexIcon: {
+    flexDirection:'row',
+    justifyContent:'space-between',
+    marginRight:20,
+  },
 
   header: {
     backgroundColor: '#FFFFFF',
@@ -160,6 +183,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#9D4EDD', 
     marginBottom: 16,
+  },
+  logoutButton: {
+    marginLeft: 10,
+  },
+  logoutButtonImage:{
+    height:35,
+    width:35,
   },
   search: {
     flexDirection: 'row',
