@@ -49,12 +49,13 @@ const OutfitCreationScreen = () => {
     { label: 'Year-round', value: 'year-round' },
   ];
 
+  //ask for permission when doing image stuff
   const requestPermissions = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
     const mediaPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
   
     if (cameraPermission.status !== 'granted' || mediaPermission.status !== 'granted') {
-      alert('Permission to access camera and gallery is required!');
+      alert('give us permmision plzzzzzzz');
       return false;
     }
     return true;
@@ -66,7 +67,7 @@ const pickImage = async (imageIndex) => {
   const permissionGranted = await requestPermissions();
   if (!permissionGranted) return;
 
-  // Prompt the user to select an option
+  // pop up to ask how user want to upload stuff
   Alert.alert(
     'Select Source',
     'Where do you want to upload image from?',
@@ -100,19 +101,19 @@ const pickImage = async (imageIndex) => {
   );
 };
 
-// Function to handle the result from either Camera or Library
+// Function to shrink the image from pickimage
 const handleImageResult = async (result, imageIndex) => {
   if (!result.canceled) {
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       result.assets[0].uri,
-      [{ resize: { width: 1024 } }], // Resize as needed
-      { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG } // Compress to 40%
+      [{ resize: { width: 1024 } }], // make sure image is not too big, limit the size
+      { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG } // same thing here, compress
     );
 
-    // Update the state with the manipulated image
+    // update the image, go back to pick image
     setOutfitImages((prevImages) => {
       const updatedImages = [...prevImages];
-      updatedImages[imageIndex] = { uri: manipulatedImage.uri }; // Store the image URI
+      updatedImages[imageIndex] = { uri: manipulatedImage.uri }; 
       return updatedImages;
     });
   }
@@ -148,7 +149,7 @@ const handleImageResult = async (result, imageIndex) => {
         return;
       }
   
-      console.log(outfitImages[0]?.uri); // Ensure there are images before proceeding
+      console.log(outfitImages[0]?.uri); // for testing, ensure there are images before proceeding
       const outfit = {
         name: outfitName,
         description: outfitDescription,
@@ -159,47 +160,48 @@ const handleImageResult = async (result, imageIndex) => {
         pieces: outfitPieces,
       };
   
-      // Ensure valid outfitImages
+      // check image
       if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
         console.error("No outfit images provided");
-        return; // Exit early if no images
+        return; // if no images it just ends
       }
   
-      // Map through the outfit images and upload them to Imgur
+      //loop through all the user uploaded images and upload to imgur
       const imgurData = await Promise.all(
         outfitImages.map(async (image) => {
-          if (!image?.uri) return null; // Skip if no image URI
+          if (!image?.uri) return null; // if theres no uploaded images we end here
   
           try {
-            // Upload image to Imgur and get the response with both link and deleteHash
+            // actual imgur stuff here
             const imgurResponse = await uploadToImgur(image.uri);
-  
+            
+            //check if our function actually does the job (from imgur.js)
             if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
               const imgurLink = imgurResponse.link;
               const deleteHash = imgurResponse.deleteHash;
   
               console.log(`Image uploaded to Imgur: ${imgurLink}`);
-              return { imageUrl: imgurLink, deleteHash }; // Store image URL and delete hash
+              return { imageUrl: imgurLink, deleteHash }; // saves image URL and delete hash
             } else {
               console.error("Imgur response is missing link or deleteHash", imgurResponse);
-              return null; // Return null if response is invalid
+              return null;
             }
           } catch (error) {
             console.error('Error uploading image to Imgur:', error);
-            return null; // Return null if upload fails
+            return null;
           }
         })
       );
   
-      // Filter out any failed uploads (null values)
+      // filter out any failed uploads (null values), chatgpt says we need this sooooo
       outfit.images = imgurData.filter((data) => data !== null);
   
       if (outfit.images.length === 0) {
         console.error("No images uploaded to Imgur.");
-        return; // Exit if no images were successfully uploaded
+        return; 
       }
   
-      // Save the outfit data to Firestore with the user's UID
+      // Save the outfit data to Firestore with the user's UID yay
       const userOutfitsRef = collection(doc(db, "users", uid), "outfits");
       await addDoc(userOutfitsRef, outfit);
   

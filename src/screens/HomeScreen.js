@@ -1,4 +1,3 @@
-// src/HomeScreen.js
 import React, { useEffect, useCallback, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -27,6 +26,7 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
   };
   
 
+  //we should try to merge the two focus effect later
   useFocusEffect(
     React.useCallback(() => {
       console.log('HomeScreen gained focus');
@@ -41,14 +41,14 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
           const usersList = await getDocs(collection(db, 'users'));
           let fetchedData = [];
     
-          // Loop through each user document
+          // loop thorugh each user 
           for (const userDoc of usersList.docs) {
             // Get all outfits for the current user
             const outfitsList = await getDocs(
               collection(db, `users/${userDoc.id}/outfits`)
             );
     
-            // Process each outfit document
+            // Process each outfit document, collect data
             outfitsList.forEach((outfitDoc) => {
               fetchedData.push({
                 id: outfitDoc.id,
@@ -60,7 +60,7 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
             });
           }
     
-          // Once all data is fetched, update the state
+          // after collected all the data stuff, update the state for our outfit array
           setOutfits(fetchedData); // Set the outfits state after all data is processed
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -69,15 +69,15 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
     
       fetchData();
   
-      // Optionally, clean up logic if needed (e.g., abort fetches)
+      
       return () => {
-        // Clean-up code if necessary
+       
       };
-    }, []) // Dependencies array should be empty or include variables if necessary
+    }, []) 
   );
   
 
-  // Load Poppins font
+  // Load Poppins font, we should look more into how font works later
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
   });
@@ -87,7 +87,7 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
 
   
 
-   // renders outfit, for now it just renders the templates above.
+   // renders outfit
    const renderOutfitCards = () => {
     return outfits.map((outfit) => (
       <View key={outfit.id} style={styles.outfitCard}>
