@@ -93,11 +93,9 @@ export default function App() {
               component={SetLocationScreen}
               options={{ headerShown: false }}
             />
-            <Stack.Screen
-              name="Signup"
-              component={SignupScreen}
-              options={{ headerShown: false }}
-            />
+            <Stack.Screen name="Signup"
+              options={{ headerShown: false }}>{(props) => <SignupScreen {...props} onLoginStateChange={checkLoginStatus} />}</Stack.Screen>
+            
           </>
         )}
       </Stack.Navigator>

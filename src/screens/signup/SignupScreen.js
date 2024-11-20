@@ -8,9 +8,10 @@ import DefaultButton from '../../components/DefaultButton';
 import { db } from '../../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { saveData } from '../../utils/storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 
-const SignupScreen = ({ navigation, route }) => {
+const SignupScreen = ({ onLoginStateChange, navigation, route }) => {
 
   const { gender, height, weight, location } = route.params;
   const [username, setUsername] = useState('');
@@ -22,6 +23,8 @@ const SignupScreen = ({ navigation, route }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(firebase_auth, email, password);
       const uid = userCredential.user.uid;
+
+      onLoginStateChange();
 
       // Save user data to Firestore
       await setDoc(doc(db, 'users', uid), {
@@ -36,12 +39,28 @@ const SignupScreen = ({ navigation, route }) => {
       // Save user login info to AsyncStorage
       await saveData('user', { uid, username, email });
 
-      alert("Sign up successful! Welcome, " + username);
-      navigation.navigate('Home');
-    } catch (err) {
-      setError(err.message);
+      // Trigger login state update in App.js
+      onLoginStateChange();
+  
+      // Navigate to the Home screen
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+      }, 100); // Small delay to allow state updates
+    } catch (error) {
+      console.error('Error logging in:', error.message);
+      // Optionally, display error feedback to the user
     }
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('SignupScreen gained focus');
+      onLoginStateChange(); // Ensure the login state is updated dynamically
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
