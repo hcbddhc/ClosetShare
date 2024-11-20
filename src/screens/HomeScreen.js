@@ -1,42 +1,69 @@
-import React, {useCallback, useState } from 'react';
+// src/HomeScreen.js
+import React, { useEffect, useCallback, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
-import { removeData } from '../utils/storage';
 
 
-const HomeScreen = ({ navigation, onLoginStateChange }) => {
-
-  //The variable that stores all the extracted outfits from the database
+const HomeScreen = (navigation) => {
   const [outfits, setOutfits] = useState([]);
 
-  // Load Poppins font, we should look more into how font works later
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
+          const usersList = await getDocs(collection(db, 'users'));
+          let fetchedData = [];
+    
+          // Loop through each user document
+          for (const userDoc of usersList.docs) {
+            // Get all outfits for the current user
+            const outfitsList = await getDocs(
+              collection(db, `users/${userDoc.id}/outfits`)
+            );
+    
+            // Process each outfit document
+            outfitsList.forEach((outfitDoc) => {
+              fetchedData.push({
+                id: outfitDoc.id,
+                outfitName: outfitDoc.data().name,
+                username: userDoc.data().username || 'Anonymous', // Fallback
+                creationDate: outfitDoc.data().creationDate || 'Unknown',
+                image: outfitDoc.data().images?.[0]?.imageUrl,
+              });
+            });
+          }
+    
+         //set data as this code's outfit ojbect
+          setOutfits(fetchedData); 
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+    
+      fetchData();
+  
+     
+      return () => {
+     
+      };
+    }, []) 
+  );
+
+  // Load Poppins font
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
   });
   if (!fontsLoaded) {
     return null;
   }
+
   
-  //for logging out
-  const handleLogout = async () => {
-    console.log('Logout triggered');
-    await removeData('user');
-    onLoginStateChange(); // This updates the `isLoggedIn` state in App.js
-  
-    // Log the updated value of `isLoggedIn`
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }, 150); // Small delay to allow state updates
-  };
-  
-   // renders outfit
+
+   // renders outfit, for now it just renders the templates above.
    const renderOutfitCards = () => {
     return outfits.map((outfit) => (
       <View key={outfit.id} style={styles.outfitCard}>
@@ -50,67 +77,13 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
     ));
   };
 
-  //runs everytime the page is loaded.
-  //we should try to merge the two focus effect later
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('HomeScreen gained focus');
-      onLoginStateChange(); // Ensure the login state is updated dynamically
-    }, [])
-  );
-
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const usersList = await getDocs(collection(db, 'users'));
-          let fetchedData = [];
-    
-          // loop thorugh each user 
-          for (const userDoc of usersList.docs) {
-            // Get all outfits for the current user
-            const outfitsList = await getDocs(
-              collection(db, `users/${userDoc.id}/outfits`)
-            );
-    
-            // Process each outfit document, collect data
-            outfitsList.forEach((outfitDoc) => {
-              fetchedData.push({
-                id: outfitDoc.id,
-                outfitName: outfitDoc.data().name,
-                username: userDoc.data().username || 'Anonymous', // Fallback
-                creationDate: outfitDoc.data().creationDate || 'Unknown',
-                image: outfitDoc.data().images?.[0]?.imageUrl,
-              });
-            });
-          }
-    
-          // after collected all the data stuff, update the state for our outfit array
-          setOutfits(fetchedData); // Set the outfits state after all data is processed
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-    
-      fetchData();
-      return () => {   
-      };
-    }, []) 
-  );
-
   return (
     <View style={styles.container}>
 
        {/* ------------------------------------------Header------------------------------------------------------- */}
       <View style= {styles.header}>
-        <View style ={styles.flexIcon}>
-          {/* Logo */}
-          <Text style={styles.logo}>CLOSET SHARE.</Text>
-          <Pressable onPress={handleLogout} style={styles.logoutButton}>
-            <Image style={styles.logoutButtonImage} source={require('../../assets/HomeScreenImages/LogoutIcon.png') } />
-          </Pressable>
-        </View>
-
+        {/* Logo */}
+        <Text style={styles.logo}>CLOSET SHARE.</Text>
 
         {/* Search Bar */}
         <View style = {styles.search}>
@@ -175,11 +148,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  flexIcon: {
-    flexDirection:'row',
-    justifyContent:'space-between',
-    marginRight:20,
-  },
 
   header: {
     backgroundColor: '#FFFFFF',
@@ -192,13 +160,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#9D4EDD', 
     marginBottom: 16,
-  },
-  logoutButton: {
-    marginLeft: 10,
-  },
-  logoutButtonImage:{
-    height:35,
-    width:35,
   },
   search: {
     flexDirection: 'row',

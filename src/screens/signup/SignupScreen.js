@@ -1,4 +1,4 @@
-// src/screens/signup/SignupScreen.js
+
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
