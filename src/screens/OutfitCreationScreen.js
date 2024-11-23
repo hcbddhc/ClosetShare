@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, Alert, ScrollView, Pressable, StyleSheet } from 'react-native';
-import { SafeAreaView} from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';  // Import the hook
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import CustomStatusBar from '../components/CustomStatusBar';
@@ -398,9 +397,8 @@ const styles = StyleSheet.create({
   bigContainer: {
     flex: 1,
   },
-  scrollContainer: {
-    backgroundColor: '#F0F0F0',
-  },
+
+//-----------------------------header section-----------------------------
   header: {
     backgroundColor: '#FFFFFF',
     paddingTop: 20,
@@ -410,10 +408,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  //left side (arrow + "create outfit")
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  //the post button
   postButton: {
     backgroundColor: '#9D4ECC',
     paddingHorizontal: 15,
@@ -422,13 +422,20 @@ const styles = StyleSheet.create({
     justifycontent: 'center',
     borderRadius: 10,
   },
+  //the post button text
   postButtonText: {
     color: 'white',
     fontSize: 18,
   },
+  // "create outfit" text
   h1: {
     fontSize: 24,
     color: '#666363',
+  },
+
+  //--------------------------add image section (where user add outfit image)-----------------------------
+  scrollContainer: {
+    backgroundColor: '#F0F0F0',
   },
   imageView: { //View that contains the whole image section
     flexDirection: 'row',
@@ -439,22 +446,22 @@ const styles = StyleSheet.create({
   imageScrollContainer: { //for the scrollView that contains all the images
     flexDireciton: 'row',
     alignContent: 'center',
-    paddingHorizontal: '2%',
   },
   imageFrame: { //for the pressable that contains the images
-    marginHorizontal: 10,
     width: 339,
     height: 281,
     justifyContent: 'center',
     alignItems: 'center',
   },
   outfitImage: { // For actual image
-    width: 339,
-    height: 281,
+    width: '90%',
+    resizeMode: 'contain',
   },
+
+  //-----------------------------content section-----------------------------
   content: {
-    marginHorizontal: 30,
-    paddingBottom: 50,
+    marginHorizontal: 22,
+    marginBottom: 20,
   },
   inputRow: {
     marginBottom: 20,
@@ -497,9 +504,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addPiece: {
-    width: "83%",
-  },
   pieceText: {
     color: '#666363',
     paddingBottom: 5,
@@ -507,6 +511,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#666363',
+  },
+  addPiece: {
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  addPieceImage: {
+    width: '100%',
+    resizeMode: 'contain',
   },
 });
 
