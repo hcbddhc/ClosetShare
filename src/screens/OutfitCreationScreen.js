@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, Alert, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { SafeAreaView} from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';  // Import the hook
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import CustomStatusBar from '../components/CustomStatusBar';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import * as ImagePicker from 'expo-image-picker';
@@ -218,7 +221,8 @@ const handleImageResult = async (result, imageIndex) => {
   };
 
   return (
-    <View style={styles.bigContainer}>
+    <SafeAreaProvider style={styles.bigContainer}>
+      <CustomStatusBar backgroundColor="white" />
       {/* ----------------------------header------------------------------*/}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -386,7 +390,7 @@ const handleImageResult = async (result, imageIndex) => {
         </View>
         {/* ----------------------------end of content------------------------------*/}
       </ScrollView>
-    </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -399,8 +403,8 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#FFFFFF',
-    paddingTop: 60,
-    paddingBottom: 25,
+    paddingTop: 20,
+    paddingBottom: 20,
     paddingHorizontal: 30,
     flexDirection: 'row',
     justifyContent: 'space-between',

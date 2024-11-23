@@ -2,7 +2,9 @@ import React, { useEffect, useCallback, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
+import CustomStatusBar from '../components/CustomStatusBar';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -124,8 +126,8 @@ const [navigationType, setNavigationType] = useState(1);
   };
 
   return (
-    <View style={styles.container}>
-
+    <SafeAreaProvider style={styles.container}>
+      <CustomStatusBar backgroundColor="white" />
        {/* ------------------------------------------Header------------------------------------------------------- */}
       <View style= {styles.header}>
         {/* Logo */}
@@ -167,12 +169,9 @@ const [navigationType, setNavigationType] = useState(1);
             />
           </ScrollView>
         </View>
-      </View>
-      
-      {/* ------------------------------------------Content------------------------------------------------------- */}
-      <View style= {styles.content}>
-        {/* Navigation Options */}
-        <View style={styles.contentSelectionContainer}>
+
+         {/* Navigation Options */}
+         <View style={styles.contentSelectionContainer}>
           <Pressable style={[
             styles.contentOption, 
             navigationType === 1 && styles.selectedOption]}
@@ -198,6 +197,10 @@ const [navigationType, setNavigationType] = useState(1);
           </Pressable>
 
         </View>
+      </View>
+      
+      {/* ------------------------------------------Content------------------------------------------------------- */}
+      <View style= {styles.content}>
 
          {/* Outfits */}
          <ScrollView contentContainerStyle={styles.outfitContainer}>
@@ -208,7 +211,7 @@ const [navigationType, setNavigationType] = useState(1);
 
       {/* ------------------------------------------Footer------------------------------------------------------- */}
       <Footer />
-    </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -216,41 +219,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
-
+  
+//-----------------------------beginning of header------------------------------
   header: {
     backgroundColor: '#FFFFFF',
-    paddingTop: 56,
-    paddingBottom: 10,
-    paddingLeft: 22,
-    shadowOffset: { width: 0, height: 1 },  
+    paddingTop: 10,
+    shadowOffset: { width: 0, height: 4 },  
     shadowColor: 'black',  
-    shadowOpacity: 0.3,  
-    elevation: 3,  
+    shadowOpacity: 0.1,  
+    elevation: 2,
   },
   logo: { 
     fontFamily: 'Poppins_700Bold',
+    marginLeft: 22,
     fontSize: 20,
     color: '#9D4EDD', 
     marginBottom: 16,
   },
+
+  //search bar
   search: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 22,
     paddingLeft: 10,
     paddingRight: 10,
     marginRight: 22,
-    padding: 4,
     backgroundColor: '#F0F0F0',
     borderRadius: 15,
+    height: 40,
   },
   searchIcon: {
     marginRight: 10,
   },
+
+  //filter bar
   filter :{
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 10,
+    marginLeft: 22,
   },
   filterIcon: {
     marginRight: 10,
@@ -273,33 +281,32 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 
-
-  content: {
-    flex: 1
-  },
-
   //For the 3 navigation options (explore, favorite, near by)
   contentSelectionContainer: { //container containing all 3 options (the bar)
     flexDirection: "row",
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
-    paddingBottom: 10,
-    marginHorizontal: '15%',
+    marginHorizontal: '10%',
   },
   contentOption: { //general styling for each option
     marginHorizontal: '6%',
   },
   contentOptionText: { //text for each option
     fontSize: 16,
+    paddingBottom: 15,
   },
   selectedOption: { //for selected navigation option
     borderBottomWidth: 2,
     borderBottomColor: '#9D4EDD',
-    paddingBottom: 2,
   },
   selectedOptionText: {
     color: '#9D4EDD',
+  },
+
+  //-----------------------------beginning of content------------------------------
+  content: {
+    flex: 1
   },
 
   //styling for the outfit cards
