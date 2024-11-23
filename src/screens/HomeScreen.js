@@ -1,16 +1,57 @@
-// src/HomeScreen.js
 import React, { useEffect, useCallback, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
 
 
 const HomeScreen = (navigation) => {
+
+  //outfits that will be rendered on the home screen
   const [outfits, setOutfits] = useState([]);
 
+  //for drop down styling, save space
+  const dropdownProps = {
+    style: styles.filterOption,
+    placeholderStyle: styles.filterText,
+    selectedTextStyle: styles.filterText,
+    iconColor: "#666363",
+    labelField: "label",
+    valueField: "value",
+  };
+  
+  //variable for filter options, and choices for the drop down menu selections
+  const [filterCategory, setFilterCategory] = useState(null);
+  const categorySelection = [
+    { label: "Remove Filter", value: null },
+    { label: 'Men', value: 'men' },
+    { label: 'Women', value: 'women' },
+    { label: 'Unisex/Gender Neutral', value: 'unisex' },
+  ];
+  const [filterBodyType, setFilterBodyType] = useState(null);
+  const bodyTypeSelection = [
+    { label: "Remove Filter", value: null },
+    { label: "Curvy", value: "curvy" },
+    { label: "Slim", value: "slim" },
+    { label: "Athletic", value: "athletic" },
+    { label: "Petite", value: "petite" },
+    { label: "Plus-size", value: "plus-size" },
+  ];
+  const [filterSeason, setFilterSeason] = useState(null);
+  const seasonSelection = [
+    { label: "Remove Filter", value: null },
+    { label: 'Spring', value: 'spring' },
+    { label: 'Summer', value: 'summer' },
+    { label: 'Fall', value: 'fall' },
+    { label: 'Winter', value: 'winter' },
+    { label: 'Year-round', value: 'year-round' },
+  ];
+
+
+  //refresh list of outfits on load
   useFocusEffect(
     useCallback(() => {
       const fetchData = async () => {
@@ -20,18 +61,29 @@ const HomeScreen = (navigation) => {
     
           // Loop through each user document
           for (const userDoc of usersList.docs) {
-            // Get all outfits for the current user
-            const outfitsList = await getDocs(
-              collection(db, `users/${userDoc.id}/outfits`)
-            );
+            //retrive all the outfits first (maybe not efficient idk)
+            let outfitsQuery = collection(db, `users/${userDoc.id}/outfits`);
+
+            // then check for filters later
+            if (filterSeason) {
+              outfitsQuery = query(outfitsQuery, where("season", "==", filterSeason));
+            }
+            if (filterCategory) {
+              outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
+            }
+            if (filterBodyType) {
+              outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
+            }
+
+            const outfitsList = await getDocs(outfitsQuery); //put everything from finalized query to an array object
     
             // Process each outfit document
             outfitsList.forEach((outfitDoc) => {
               fetchedData.push({
                 id: outfitDoc.id,
                 outfitName: outfitDoc.data().name,
-                username: userDoc.data().username || 'Anonymous', // Fallback
-                creationDate: outfitDoc.data().creationDate || 'Unknown',
+                username: userDoc.data().username || "Anonymous", // Fallback
+                creationDate: outfitDoc.data().creationDate || "Unknown",
                 image: outfitDoc.data().images?.[0]?.imageUrl,
               });
             });
@@ -43,14 +95,8 @@ const HomeScreen = (navigation) => {
           console.error('Error fetching data:', error);
         }
       };
-    
       fetchData();
-  
-     
-      return () => {
-     
-      };
-    }, []) 
+    }, [filterSeason, filterCategory, filterBodyType]) 
   );
 
   // Load Poppins font
@@ -61,9 +107,7 @@ const HomeScreen = (navigation) => {
     return null;
   }
 
-  
-
-   // renders outfit, for now it just renders the templates above.
+   // function for rendering outfit
    const renderOutfitCards = () => {
     return outfits.map((outfit) => (
       <View key={outfit.id} style={styles.outfitCard}>
@@ -95,22 +139,30 @@ const HomeScreen = (navigation) => {
         <View style = {styles.filter}>
           <Pressable style={styles.filterIcon}><Image source={require('../../assets/HomeScreenImages/Filter Icon.png')}/></Pressable>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptionsContainer}>
-            <Pressable style={styles.filterOption}>
-              <Text style={styles.filterText}>Gender</Text>
-              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
-            </Pressable>
+            <Dropdown
+                {...dropdownProps}
+                data={categorySelection}
+                value={filterCategory}
+                onChange={item => setFilterCategory(item.value)}
+                placeholder="Category"
+            />
+            <Dropdown
+                {...dropdownProps}
+                data={bodyTypeSelection}
+                value={filterBodyType}
+                onChange={item => setFilterBodyType(item.value)}
+                placeholder="Body Type"
+            />
             <Pressable style={styles.filterOption}>
               <Text style={styles.filterText}>Height</Text>
-              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
             </Pressable>
-            <Pressable style={styles.filterOption}>
-              <Text style={styles.filterText}>Season</Text>
-              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
-            </Pressable>
-            <Pressable style={styles.filterOption}>
-              <Text style={styles.filterText}>Body Type</Text>
-              <Image source={require('../../assets/HomeScreenImages/DropdownIcon.png')} style={styles.dropdownIcon} />
-            </Pressable>
+            <Dropdown
+                {...dropdownProps}
+                data={seasonSelection}
+                value={filterSeason}
+                onChange={item => setFilterSeason(item.value)}
+                placeholder="Season"
+            />
           </ScrollView>
         </View>
       </View>
@@ -184,9 +236,9 @@ const styles = StyleSheet.create({
   },
   filterText: {
     color: '#666363',
+    fontSize: 14,
   },
   filterOption: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ECCBFF',
     marginRight: 10,
