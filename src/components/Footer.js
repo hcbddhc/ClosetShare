@@ -31,8 +31,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     paddingHorizontal: '17%',
     paddingVertical: 10,
-    borderTopWidth: 1, 
-    borderTopColor: '#666363', 
+    shadowOffset: { width: 0, height: -1 },  
+    shadowColor: 'black',  
+    shadowOpacity: 0.3,  
+    elevation: 3, 
   },
   footerOption: {
     alignItems: 'center',

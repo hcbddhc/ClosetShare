@@ -50,6 +50,8 @@ const HomeScreen = (navigation) => {
     { label: 'Year-round', value: 'year-round' },
   ];
 
+//variable for navigation state (1 = explore, 2 = favorites, 3 = near me)
+const [navigationType, setNavigationType] = useState(1);
 
   //refresh list of outfits on load
   useFocusEffect(
@@ -171,15 +173,30 @@ const HomeScreen = (navigation) => {
       <View style= {styles.content}>
         {/* Navigation Options */}
         <View style={styles.contentSelectionContainer}>
-          <Pressable style={styles.contentOption}>
-            <Text style={styles.contentOptionText}>Explore</Text>
+          <Pressable style={[
+            styles.contentOption, 
+            navigationType === 1 && styles.selectedOption]}
+            onPress = {() => setNavigationType(1)}
+          >
+            <Text style={[styles.contentOptionText, navigationType === 1 && styles.selectedOptionText]}>Explore</Text>
           </Pressable>
-          <Pressable style={styles.contentOption}>
-            <Text style={styles.contentOptionText}>Favorites</Text>
+
+          <Pressable style={[
+            styles.contentOption, 
+            navigationType === 2 && styles.selectedOption]}
+            onPress = {() => setNavigationType(2)}
+          >
+            <Text style={[styles.contentOptionText, navigationType === 2 && styles.selectedOptionText]}>Favorites</Text>
           </Pressable>
-          <Pressable style={styles.contentOption}>
-            <Text style={styles.contentOptionText}>Nearby</Text>
+
+          <Pressable style={[
+            styles.contentOption, 
+            navigationType === 3 && styles.selectedOption]}
+            onPress = {() => setNavigationType(3)}
+          >
+            <Text style={[styles.contentOptionText, navigationType === 3 && styles.selectedOptionText]}>Nearby</Text>
           </Pressable>
+
         </View>
 
          {/* Outfits */}
@@ -206,6 +223,10 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: 10,
     paddingLeft: 22,
+    shadowOffset: { width: 0, height: 1 },  
+    shadowColor: 'black',  
+    shadowOpacity: 0.3,  
+    elevation: 3,  
   },
   logo: { 
     fontFamily: 'Poppins_700Bold',
@@ -256,19 +277,32 @@ const styles = StyleSheet.create({
   content: {
     flex: 1
   },
-  contentSelectionContainer: {
+
+  //For the 3 navigation options (explore, favorite, near by)
+  contentSelectionContainer: { //container containing all 3 options (the bar)
     flexDirection: "row",
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
     paddingBottom: 10,
+    marginHorizontal: '15%',
   },
-  contentOption: {
+  contentOption: { //general styling for each option
     marginHorizontal: '6%',
   },
-  contentOptionText: {
+  contentOptionText: { //text for each option
     fontSize: 16,
   },
+  selectedOption: { //for selected navigation option
+    borderBottomWidth: 2,
+    borderBottomColor: '#9D4EDD',
+    paddingBottom: 2,
+  },
+  selectedOptionText: {
+    color: '#9D4EDD',
+  },
+
+  //styling for the outfit cards
   outfitContainer: {
     flexGrow: 1, // Ensures the content can grow and overflow
     flexDirection: 'row',
@@ -282,7 +316,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: '48%', // Adjust the width to fit two items per row (slightly less than half the screen width)
     height: 264,
-    marginBottom: 15, // Add spacing between rows
+    marginBottom: 15,
+    shadowOffset: { width: 0, height: 1 },  
+    shadowColor: 'black',  
+    shadowOpacity: 0.2,  
+    elevation: 3, 
   },
   outfitImage: {
     width: '100%',
