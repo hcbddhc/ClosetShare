@@ -3,6 +3,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
 import CustomStatusBar from '../components/CustomStatusBar';
+import OutfitCard from '../components/OutfitCard';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -113,15 +114,8 @@ const [navigationType, setNavigationType] = useState(1);
 
    // function for rendering outfit
    const renderOutfitCards = () => {
-    return outfits.map((outfit) => (
-      <View key={outfit.id} style={styles.outfitCard}>
-        <Image source={{uri: outfit.image}} style={styles.outfitImage}/>
-        <View style={styles.outfitContent}>
-          <Text style={styles.outfitName}>{outfit.outfitName}</Text>
-          <Text style={styles.outfitUserName}>{outfit.username}</Text>
-          <Text style={styles.outfitDate}>{outfit.creationDate}</Text>
-        </View>
-      </View>
+    return outfits.map((outfits) => (
+      <OutfitCard outfits={outfits} />
     ));
   };
 
@@ -309,7 +303,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
 
-  //styling for the outfit cards
+  //styling for the outfit container
   outfitContainer: {
     flexGrow: 1, // Ensures the content can grow and overflow
     flexDirection: 'row',
@@ -317,38 +311,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between', // Space out items
     paddingTop: 10,
     marginHorizontal: 22,
-  },
-  outfitCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    width: '48%', // Adjust the width to fit two items per row (slightly less than half the screen width)
-    height: 264,
-    marginBottom: 15,
-    shadowOffset: { width: 0, height: 1 },  
-    shadowColor: 'black',  
-    shadowOpacity: 0.2,  
-    elevation: 3, 
-  },
-  outfitImage: {
-    width: '100%',
-    height: 172,
-    borderTopLeftRadius: 8,  // Apply radius to the top-left corner
-    borderTopRightRadius: 8, // Apply radius to the top-right corner
-  },
-  outfitContent: {
-    flex: 1,
-    padding: 10,
-  },
-  outfitName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  outfitUserName: {
-    color: '#9D4EDD',
-    marginBottom: 20,
-  },
-  outfitDate: {
-    color: '#666363',
   },
 });
 
