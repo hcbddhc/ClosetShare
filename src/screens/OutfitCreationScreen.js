@@ -452,10 +452,13 @@ const styles = StyleSheet.create({
     height: 281,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 10,
   },
   outfitImage: { // For actual image
-    width: '90%',
+    width: 339,
+    height: 281,
     resizeMode: 'contain',
+    
   },
 
   //-----------------------------content section-----------------------------
