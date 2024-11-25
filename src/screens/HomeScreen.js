@@ -115,7 +115,7 @@ const [navigationType, setNavigationType] = useState(1);
    // function for rendering outfit
    const renderOutfitCards = () => {
     return outfits.map((outfits) => (
-      <OutfitCard outfits={outfits} />
+      <OutfitCard key={outfits.id} outfits={outfits} />
     ));
   };
 

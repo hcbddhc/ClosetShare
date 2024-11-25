@@ -1,8 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+//firebase stuff
+import { doc, collection, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { getData } from '../utils/storage'; 
 
 const OutfitCard = ({ outfits }) => {
     const [likedStatus, setLikedStatus] = useState(0);
+
+    useEffect(() => {
+        const fetchFavoriteStatus = async () => {
+            try {
+                // Retrieve the logged-in user's uid from AsyncStorage
+                const user = await AsyncStorage.getItem('user');
+                const uid = JSON.parse(user)?.uid;
+
+                if (!uid) {
+                    console.error("User not logged in bye bye");
+                    return;
+                }
+
+                // Reference to the user's Firestore document
+                const userDocRef = doc(db, "users", uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (userDoc.exists()) {
+                    const favoriteOutfits = userDoc.data().favoriteOutfits || [];
+                    setLikedStatus(favoriteOutfits.includes(outfits.id) ? 1 : 0);
+                }
+            } catch (error) {
+                console.error("Error fetching favorite status: ", error);
+            }
+        };
+
+        fetchFavoriteStatus();
+    }, [outfits.id]);
 
     //function for when the user pressed on the card
     const cardPress = () => {
@@ -10,13 +44,38 @@ const OutfitCard = ({ outfits }) => {
     }
 
     //function for when the user pressed on the like icon
-    const likePress = (outfitID) => {
-        if(likedStatus === 0){
-            setLikedStatus(1);
-        }else{
-            setLikedStatus(0);
-        }
-        console.log("like icon pressed! outfitID: " + outfitID);
+    const likePress = async (outfitID) => {
+        try {
+            // Retrieve the logged-in user's uid from AsyncStorage
+            const user = await getData('user');
+            const uid = user?.uid;
+
+            if (!uid) {
+                console.error("User is not logged in. UID not found.");
+                return;
+              }
+            
+            //creating a reference to the current logged in user's document in firebase
+            const userDocRef = doc(db, "users", uid);
+
+            //handle actual press activity
+            if (likedStatus === 0) {
+                await updateDoc(userDocRef, {
+                    favoriteOutfits: arrayUnion(outfitID),
+                });
+                setLikedStatus(1);
+                console.log("outfit " + outfitID + "saved to user " + uid + "'s favorite list");
+            } else {
+                await updateDoc(userDocRef, {
+                    favoriteOutfits: arrayRemove(outfitID),
+                });
+                setLikedStatus(0);
+                console.log("outfit " + outfitID + "removed from user " + uid + "'s favorite list");
+            }
+        }catch (error) {
+            console.error("Error during liking or unliking outfits: ", error);
+          }
+
     }
 
     return (
@@ -30,7 +89,7 @@ const OutfitCard = ({ outfits }) => {
             <Pressable
                 style={styles.outfitLikeButton}
                 onPress={(event) => {
-                event.stopPropagation(); // Prevent parent Pressable from being triggered
+                event.stopPropagation(); 
                 likePress(outfits.id);
                 }}
             >
