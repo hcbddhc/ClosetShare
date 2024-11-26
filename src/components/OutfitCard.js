@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //firebase stuff
@@ -8,6 +9,9 @@ import { db } from '../firebaseConfig';
 import { getData } from '../utils/storage'; 
 
 const OutfitCard = ({ outfits }) => {
+    //navigation stuff
+  const navigation = useNavigation(); 
+
     const [likedStatus, setLikedStatus] = useState(0);
 
     useEffect(() => {
@@ -16,7 +20,6 @@ const OutfitCard = ({ outfits }) => {
                 // Retrieve the logged-in user's uid from AsyncStorage
                 const user = await AsyncStorage.getItem('user');
                 const uid = JSON.parse(user)?.uid;
-
                 if (!uid) {
                     console.error("User not logged in bye bye");
                     return;
@@ -38,10 +41,15 @@ const OutfitCard = ({ outfits }) => {
         fetchFavoriteStatus();
     }, [outfits.id]);
 
-    //function for when the user pressed on the card
-    const cardPress = () => {
-        console.log("outfit card pressed");
-    }
+     //function for when the user presses on the card
+     const cardPress = (outfitID) => {
+        console.log("outfit card pressed", outfitID.id, 'by ', outfitID.userID);
+        // Pass both the outfit ID and the user ID to the next screen
+        navigation.navigate('DetailedOutfit', {
+            outfitId: outfitID.id,
+            userId: outfitID.userID
+        });
+    };
 
     //function for when the user pressed on the like icon
     const likePress = async (outfitID) => {
@@ -79,7 +87,13 @@ const OutfitCard = ({ outfits }) => {
     }
 
     return (
-      <Pressable onPress= {cardPress} style={styles.outfitCard}>
+        <Pressable
+            style={styles.outfitCard}
+            onPress={(event) => {
+                event.stopPropagation(); 
+                cardPress(outfits); // Pass the full outfit object instead of just the ID
+            }}
+         >
         <Image source={{ uri: outfits.image }} style={styles.outfitImage} />
         <View style={styles.outfitContent}>
           <Text style={styles.outfitName}>{outfits.outfitName}</Text>

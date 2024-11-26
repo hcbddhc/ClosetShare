@@ -13,6 +13,8 @@ import LocationPermissionScreen from './src/screens/signup/LocationPermissionScr
 import SetLocationScreen from './src/screens/signup/SetLocationScreen';
 import SignupScreen from './src/screens/signup/SignupScreen';
 import OutfitCreationScreen from './src/screens/OutfitCreationScreen';
+import DetailedOutfitScreen from './src/screens/DetailedOutfitScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +49,11 @@ export default function App() {
             <Stack.Screen
               name="OutfitCreation"
               component={OutfitCreationScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="DetailedOutfit"
+              component={DetailedOutfitScreen}
               options={{ headerShown: false }}
             />
           </>

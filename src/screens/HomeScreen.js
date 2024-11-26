@@ -81,16 +81,17 @@ const [navigationType, setNavigationType] = useState(1);
             }
 
             const outfitsList = await getDocs(outfitsQuery); //put everything from finalized query to an array object
-    
             // Process each outfit document
             outfitsList.forEach((outfitDoc) => {
               fetchedData.push({
                 id: outfitDoc.id,
+                userID: userDoc.id,
                 outfitName: outfitDoc.data().name,
                 username: userDoc.data().username || "Anonymous", // Fallback
                 creationDate: outfitDoc.data().creationDate || "Unknown",
                 image: outfitDoc.data().images?.[0]?.imageUrl,
               });
+
             });
           }
     
