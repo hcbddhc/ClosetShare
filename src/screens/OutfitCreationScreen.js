@@ -66,7 +66,11 @@ const OutfitCreationScreen = () => {
 
   //function for camera integration
   // Function to handle camera or image library selection
-const pickImage = async (imageIndex) => {
+const pickImage = async (uploadOption, imageIndex) => {
+  //uploadOption is a boolean to determine (for image picker) wheter the image is being saved as outfit image or piece image
+  //0: outfit image
+  //1: piece image
+
   const permissionGranted = await requestPermissions();
   if (!permissionGranted) return;
 
@@ -85,7 +89,7 @@ const pickImage = async (imageIndex) => {
             allowsEditing: true,
             aspect: [4, 3],
           });
-          handleImageResult(result, imageIndex);
+          handleImageResult(result, uploadOption, imageIndex);
         },
       },
       {
@@ -97,7 +101,7 @@ const pickImage = async (imageIndex) => {
             allowsEditing: true,
             aspect: [4, 3],
           });
-          handleImageResult(result, imageIndex);
+          handleImageResult(result, uploadOption, imageIndex);
         },
       },
     ]
@@ -105,20 +109,32 @@ const pickImage = async (imageIndex) => {
 };
 
 // Function to shrink the image from pickimage
-const handleImageResult = async (result, imageIndex) => {
+const handleImageResult = async (result, uploadOption, imageIndex) => {
   if (!result.canceled) {
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       result.assets[0].uri,
       [{ resize: { width: 1024 } }], // make sure image is not too big, limit the size
       { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG } // same thing here, compress
     );
-
-    // update the image, go back to pick image
-    setOutfitImages((prevImages) => {
-      const updatedImages = [...prevImages];
-      updatedImages[imageIndex] = { uri: manipulatedImage.uri }; 
-      return updatedImages;
-    });
+    
+    //for outfit image
+    if (uploadOption === 0) {  // If it's an outfit image
+      setOutfitImages((prevImages) => {
+        const updatedImages = [...prevImages];
+        updatedImages[imageIndex] = { uri: manipulatedImage.uri }; 
+        return updatedImages;
+      });
+    } else if (uploadOption === 1) {  // If it's a piece image
+      setOutfitPieces((prevOutfitPieces) => {
+        const updatedOutfitPieces = [...prevOutfitPieces];
+        updatedOutfitPieces[imageIndex] = {
+          ...updatedOutfitPieces[imageIndex],  // keep other properties
+          image: { uri: manipulatedImage.uri },  // only update the image
+        };
+        return updatedOutfitPieces;
+      });
+    }
+    
   }
 };
 
@@ -244,7 +260,7 @@ const handleImageResult = async (result, imageIndex) => {
               <Pressable
                 key={index}
                 style={styles.imageFrame}
-                onPress={() => pickImage(index)} // Pass the index to the pickImage function
+                onPress={() => pickImage(0, index)} // Pass the index to the pickImage function
               >
                 {image ? (
                   <Image style={styles.outfitImage} source={{ uri: image.uri }} />
@@ -342,15 +358,16 @@ const handleImageResult = async (result, imageIndex) => {
           {outfitPieces.map((piece, index) => (
             <View key={piece.id} style={styles.outfitPiece}>
 
-              <Pressable style={styles.pieceLeft}>
-                <Image
-                  style={styles.pieceImage}
-                  source={
-                    piece.image
-                      ? { uri: piece.image }
-                      : require('../../assets/outfitCreationImages/outfit piece upload.png')
-                  }
-                />
+              <Pressable
+                key={piece.id-1}
+                style={styles.pieceLeft}
+                onPress={() => pickImage(1, piece.id-1)} // Pass the index to the pickImage function
+              >
+                {outfitPieces[piece.id-1].image ? (
+                  <Image style={styles.pieceImage} source={{ uri: outfitPieces[piece.id-1].image.uri }} />
+                ) : (
+                  <Image style={styles.pieceImage} source={require('../../assets/outfitCreationImages/Add Outfit.png')} />
+                )}
               </Pressable>
 
               <View style={styles.pieceRight}>
@@ -497,7 +514,8 @@ const styles = StyleSheet.create({
     width: '35%',
   },
   pieceImage: {
-    width: '100%',
+    width: 113,
+    height: 94,
   },
   pieceRight: {
     width: '50%',
