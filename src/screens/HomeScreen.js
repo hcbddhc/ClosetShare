@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, doc, getDocs, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import Footer from '../components/Footer';
 import CustomStatusBar from '../components/CustomStatusBar';
@@ -9,6 +9,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
+import { getData } from '../utils/storage'; 
 
 
 const HomeScreen = (navigation) => {
@@ -25,6 +26,12 @@ const HomeScreen = (navigation) => {
     labelField: "label",
     valueField: "value",
   };
+
+  //variable for method of navigation (explore, favorites, and nearby)
+  //1: explore
+  //2: favorites
+  //3: nearby
+  const [navigationMode, setNavigationMode] = useState(1);
   
   //variable for filter options, and choices for the drop down menu selections
   const [filterCategory, setFilterCategory] = useState(null);
@@ -53,57 +60,118 @@ const HomeScreen = (navigation) => {
     { label: 'Year-round', value: 'year-round' },
   ];
 
-//variable for navigation state (1 = explore, 2 = favorites, 3 = near me)
-const [navigationType, setNavigationType] = useState(1);
-
   //refresh list of outfits on load
-  useFocusEffect(
-    useCallback(() => {
-      const fetchData = async () => {
-        try {
-          const usersList = await getDocs(collection(db, 'users'));
-          let fetchedData = [];
-    
-          // Loop through each user document
-          for (const userDoc of usersList.docs) {
-            //retrive all the outfits first (maybe not efficient idk)
-            let outfitsQuery = collection(db, `users/${userDoc.id}/outfits`);
+useFocusEffect(
+  useCallback(() => {
+    const fetchData = async () => {
+      try {
+        // If navigationMode is 2, we want to fetch only the liked outfits of the current user
+        if (navigationMode === 2) {
+          // Get the current logged-in user's UID
+          const user = await getData('user');
+          const uid = user?.uid;
 
-            // then check for filters later
-            if (filterSeason) {
-              outfitsQuery = query(outfitsQuery, where("season", "==", filterSeason));
-            }
-            if (filterCategory) {
-              outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
-            }
-            if (filterBodyType) {
-              outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
-            }
-
-            const outfitsList = await getDocs(outfitsQuery); //put everything from finalized query to an array object
-            // Process each outfit document
-            outfitsList.forEach((outfitDoc) => {
-              fetchedData.push({
-                id: outfitDoc.id,
-                userID: userDoc.id,
-                outfitName: outfitDoc.data().name,
-                username: userDoc.data().username || "Anonymous", // Fallback
-                creationDate: outfitDoc.data().creationDate || "Unknown",
-                image: outfitDoc.data().images?.[0]?.imageUrl,
-              });
-
-            });
+          if (!uid) {
+            console.log("User is not logged in");
+            setOutfits([]); // If no user is logged in, return empty
+            return;
           }
-    
-         //set data as this code's outfit ojbect
-          setOutfits(fetchedData); 
-        } catch (error) {
-          console.error('Error fetching data:', error);
+
+          // Get the user's document from the 'users' collection
+          const userDoc = await getDoc(doc(db, 'users', uid));
+          const favoriteOutfits = userDoc.data().favoriteOutfits || [];
+
+          // If no liked outfits, return empty
+          if (favoriteOutfits.length === 0) {
+            setOutfits([]); 
+            return;
+          }
+
+          // Fetch details for each outfit that the user has liked by looping through all users' outfits
+          let fetchedData = [];
+
+          // Fetch all users
+          const usersList = await getDocs(collection(db, 'users'));
+
+          console.log("Users list:", usersList); // Log the entire users list for debugging
+
+          for (const userDoc of usersList.docs) {
+            // Check if the user has an 'outfits' field
+            const outfitsRef = collection(db, `users/${userDoc.id}/outfits`); // Reference to the user's subcollection of outfits
+            const outfitsSnapshot = await getDocs(outfitsRef);
+            const userOutfits = outfitsSnapshot.docs.map(doc => doc.id); 
+
+            // Loop through each outfit in the current user
+            for (const outfit of userOutfits) {
+
+              // Check if the outfit's UID (outfit) matches the liked outfit ID
+              if (favoriteOutfits.includes(outfit)) {
+
+               
+                const outfitDoc = await getDoc(doc(db, `users/${userDoc.id}/outfits/${outfit}`));// Outfit ID is the UID here
+
+                if (outfitDoc.exists()) {
+                  fetchedData.push({
+                    id: outfitDoc.id, 
+                    outfitName: outfitDoc.data().name,
+                    creationDate: outfitDoc.data().creationDate || "Unknown",
+                    image: outfitDoc.data().images?.[0]?.imageUrl,
+                  });
+                }
+              }
+            }
+          }
+          setOutfits(fetchedData); // Set the liked outfits
+          return; // Exit early after fetching liked outfits
         }
-      };
-      fetchData();
-    }, [filterSeason, filterCategory, filterBodyType]) 
-  );
+
+        // If navigationMode is 1 or 3, fetch all outfits as usual
+        const usersList = await getDocs(collection(db, 'users'));
+        let fetchedData = [];
+
+        // Loop through each user document
+        for (const userDoc of usersList.docs) {
+          // Retrieve all the outfits for each user
+          let outfitsQuery = collection(db, `users/${userDoc.id}/outfits`);
+
+          // Apply filters
+          if (filterSeason) {
+            outfitsQuery = query(outfitsQuery, where("season", "==", filterSeason));
+          }
+          if (filterCategory) {
+            outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
+          }
+          if (filterBodyType) {
+            outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
+          }
+
+          const outfitsList = await getDocs(outfitsQuery); // Fetch outfits based on query
+
+          // Process each outfit document
+          outfitsList.forEach((outfitDoc) => {
+            fetchedData.push({
+              id: outfitDoc.id, // This is the outfit's UID
+              userID: userDoc.id,
+              outfitName: outfitDoc.data().name,
+              username: userDoc.data().username || "Anonymous", // Fallback
+              creationDate: outfitDoc.data().creationDate || "Unknown",
+              image: outfitDoc.data().images?.[0]?.imageUrl,
+            });
+          });
+        }
+
+        // Set the fetched data as the outfits state
+        setOutfits(fetchedData);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [navigationMode, filterSeason, filterCategory, filterBodyType])
+);
+
 
   // Load Poppins font
   const [fontsLoaded] = useFonts({
@@ -169,26 +237,26 @@ const [navigationType, setNavigationType] = useState(1);
          <View style={styles.contentSelectionContainer}>
           <Pressable style={[
             styles.contentOption, 
-            navigationType === 1 && styles.selectedOption]}
-            onPress = {() => setNavigationType(1)}
+            navigationMode === 1 && styles.selectedOption]}
+            onPress = {() => setNavigationMode(1)}
           >
-            <Text style={[styles.contentOptionText, navigationType === 1 && styles.selectedOptionText]}>Explore</Text>
+            <Text style={[styles.contentOptionText, navigationMode === 1 && styles.selectedOptionText]}>Explore</Text>
           </Pressable>
 
           <Pressable style={[
             styles.contentOption, 
-            navigationType === 2 && styles.selectedOption]}
-            onPress = {() => setNavigationType(2)}
+            navigationMode === 2 && styles.selectedOption]}
+            onPress = {() => setNavigationMode(2)}
           >
-            <Text style={[styles.contentOptionText, navigationType === 2 && styles.selectedOptionText]}>Favorites</Text>
+            <Text style={[styles.contentOptionText, navigationMode === 2 && styles.selectedOptionText]}>Favorites</Text>
           </Pressable>
 
           <Pressable style={[
             styles.contentOption, 
-            navigationType === 3 && styles.selectedOption]}
-            onPress = {() => setNavigationType(3)}
+            navigationMode === 3 && styles.selectedOption]}
+            onPress = {() => setNavigationMode(3)}
           >
-            <Text style={[styles.contentOptionText, navigationType === 3 && styles.selectedOptionText]}>Nearby</Text>
+            <Text style={[styles.contentOptionText, navigationMode === 3 && styles.selectedOptionText]}>Nearby</Text>
           </Pressable>
 
         </View>

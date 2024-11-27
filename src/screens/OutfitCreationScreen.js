@@ -246,7 +246,8 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
         bodyType: outfitBodyType,
         season: outfitSeason,
         images: validProcessedOutfitImages,
-        pieces: processedOutfitPieces
+        pieces: processedOutfitPieces,
+        creationDate: new Date().toISOString().split('T')[0]
       };
 
       console.log("outfit uploaded: " + JSON.stringify(outfit));
