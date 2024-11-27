@@ -155,6 +155,29 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
     setOutfitPieces(updatedPieces);
   };
 
+  //function that uploads an image to imgur, and returns a uri and delete hash.
+  const uploadImageToImgur = async (image) => {
+    if (!image?.uri) {
+      console.error("No image URI provided");
+      return null;
+    }
+  
+    try {
+      const imgurResponse = await uploadToImgur(image.uri);
+  
+      if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
+        console.log(`Image uploaded to Imgur: ${imgurResponse.link}`);
+        return { imageUrl: imgurResponse.link, deleteHash: imgurResponse.deleteHash };
+      } else {
+        console.error("Imgur response is missing link or deleteHash", imgurResponse);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading image to Imgur:", error);
+      return null;
+    }
+  };
+
   //run when post button is pressed, 
   //compile the outfit object from user selection and inputs, and send to database
   const postOutfit = async () => {
@@ -162,13 +185,59 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
       // Retrieve the logged-in user's uid from AsyncStorage
       const user = await getData('user');
       const uid = user?.uid;
-  
       if (!uid) {
         console.error("User is not logged in. UID not found.");
         return;
       }
-  
-      console.log(outfitImages[0]?.uri); // for testing, ensure there are images before proceeding
+
+      // check image
+      if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
+        console.error("No outfit images provided");
+        return; // if no images it just ends
+      }
+
+      //start processing outfit images (outfitImages)
+      const processedOutfitImages = await Promise.all(
+        outfitImages.map(async (image) => {
+          // Check if the image is null or has no URI
+          if (!image || !image.uri) {
+            return null; // Skip processing if image is null or invalid
+          }
+          try {
+            const result = await uploadImageToImgur(image);
+            return result; // result will be null if upload fails or the image is invalid
+          } catch (error) {
+            console.error("Error uploading image to Imgur:", error);
+            return null;
+          }
+        })
+      );
+      //remove all the null pictures in case users left that empty
+      const validProcessedOutfitImages = processedOutfitImages.filter((image) => image !== null);
+
+      // Process outfit pieces images
+      const processedOutfitPieces = await Promise.all(
+        outfitPieces.map(async (piece) => {
+          if (!piece.image || !piece.image.uri) {
+            return null; // Skip processing if image is null or invalid
+          }
+          try {
+            if (piece.image) { // Only process if the image exists
+              const result = await uploadImageToImgur(piece.image);
+              return result; // result will be null if upload fails or the image is invalid
+            } else {
+              return null; // Return null if there is no image
+            }
+          } catch (error) {
+            console.error("Error uploading piece image to Imgur:", error);
+            return null;
+          }
+        })
+      );
+      
+
+      // Save the outfit data to Firestore with the user's UID yay
+      //outfit is the object that will be send to firebase
       const outfit = {
         name: outfitName,
         description: outfitDescription,
@@ -176,63 +245,24 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
         category: outfitCategory,
         bodyType: outfitBodyType,
         season: outfitSeason,
-        pieces: outfitPieces,
+        images: validProcessedOutfitImages,
+        pieces: processedOutfitPieces
       };
-  
-      // check image
-      if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
-        console.error("No outfit images provided");
-        return; // if no images it just ends
-      }
-  
-      //loop through all the user uploaded images and upload to imgur
-      const imgurData = await Promise.all(
-        outfitImages.map(async (image) => {
-          if (!image?.uri) return null; // if theres no uploaded images we end here
-  
-          try {
-            // actual imgur stuff here
-            const imgurResponse = await uploadToImgur(image.uri);
-            
-            //check if our function actually does the job (from imgur.js)
-            if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
-              const imgurLink = imgurResponse.link;
-              const deleteHash = imgurResponse.deleteHash;
-  
-              console.log(`Image uploaded to Imgur: ${imgurLink}`);
-              return { imageUrl: imgurLink, deleteHash }; // saves image URL and delete hash
-            } else {
-              console.error("Imgur response is missing link or deleteHash", imgurResponse);
-              return null;
-            }
-          } catch (error) {
-            console.error('Error uploading image to Imgur:', error);
-            return null;
-          }
-        })
-      );
-  
-      // filter out any failed uploads (null values), chatgpt says we need this sooooo
-      outfit.images = imgurData.filter((data) => data !== null);
-  
-      if (outfit.images.length === 0) {
-        console.error("No images uploaded to Imgur.");
-        return; 
-      }
-  
-      // Save the outfit data to Firestore with the user's UID yay
+
+      console.log("outfit uploaded: " + JSON.stringify(outfit));
+      
       const userOutfitsRef = collection(doc(db, "users", uid), "outfits");
       await addDoc(userOutfitsRef, outfit);
   
       console.log("Outfit added successfully!");
       navigation.navigate('Home');
+      
     } catch (error) {
       console.error("Error during outfit posting: ", error);
     }
   };
 
   const testtuff = async () => {
-    navigation.navigate('Home');
   };
 
   return (

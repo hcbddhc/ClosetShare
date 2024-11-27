@@ -61,11 +61,66 @@ const DetailedOutfitScreen = ({ route }) => {
                 </View>
             </View>
 
-            <Text style={styles.outfitName}>{outfit.description}</Text>
-            <Text style={styles.outfitName}>{outfit.bodyType}</Text>
-            <Text style={styles.outfitName}>{outfit.category}</Text>
-            <Text style={styles.outfitName}>{outfit.height}</Text>
-            <Text style={styles.outfitName}>{outfit.season}</Text>
+            {/* ----------------------------ScrollView for images------------------------------*/}
+            <ScrollView style={styles.scrollContainer}>
+              <View style={styles.imageView}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageScrollContainer}>
+                  {outfit.images && outfit.images.length > 0 && outfit.images.map((image, index) => (
+                      <View key={index} style={styles.imageFrame}>
+                        <Image style={styles.outfitImage} source={{ uri: image.imageUrl }} />
+                      </View>
+                  ))}
+                  </ScrollView>
+              </View>
+
+              {/* ----------------------------content------------------------------*/}
+              <View style={styles.content}>
+                {/* --------Description Field----------*/}
+                <View style={styles.outputRow}>
+                  <Text style={styles.captionText}>Description</Text>
+                  <Text style={styles.outputText}>{outfit.description}</Text>
+                </View>
+
+                {/* --------Height + Category Field----------*/}
+                <View style={[styles.outputRow, styles.flexRow]} >
+                  <View style={styles.rowItem}>
+                    <Text style={styles.captionText}>Height</Text>
+                    <Text style={styles.outputText}>{outfit.height}</Text>
+                  </View>
+                  <View style={styles.rowItem}>
+                    <Text style={styles.captionText}>Category</Text>
+                    <Text style={styles.outputText}>{outfit.category}</Text>
+                  </View>
+                </View>
+
+                {/* --------Body Type + Outfit Season Field----------*/}
+                <View style={[styles.outputRow, styles.flexRow]}>
+                  <View style={styles.rowItem}>
+                    <Text style={styles.captionText}>Body Type</Text>
+                    <Text style={styles.outputText}>{outfit.bodyType}</Text>
+                  </View>
+                  <View style={styles.rowItem}>
+                    <Text style={styles.captionText}>Outfit Season</Text>
+                    <Text style={styles.outputText}>{outfit.season}</Text>
+                  </View>
+                </View>
+
+                {/* ----------------------------outfit pieces------------------------------*/}
+                <View style={styles.imageView}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageScrollContainer}>
+                  {outfit.pieces && outfit.pieces.length > 0 && outfit.pieces.map((piece, pieceIndex) => (
+                    piece.image && piece.image.length > 0 && piece.image.map((image, index) => (
+                      <View key={`${pieceIndex}-${index}`} style={styles.imageFrame}>
+                        <Image style={styles.outfitImage} source={{ uri: image.imageUrl }} />
+                      </View>
+                    ))
+                  ))}
+                </ScrollView>
+                </View>
+
+              </View>
+
+            </ScrollView>
         </SafeAreaProvider>
         
     );
@@ -91,6 +146,58 @@ const styles = StyleSheet.create({
         fontSize: 24,
         color: '#666363',
       },
+
+      //--------------------------add image section (where user add outfit image)-----------------------------
+  scrollContainer: {
+    backgroundColor: '#F0F0F0',
+  },
+  imageView: { //View that contains the whole image section
+    flexDirection: 'row',
+    alignContent: 'center',
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  imageScrollContainer: { //for the scrollView that contains all the images
+    flexDireciton: 'row',
+    alignContent: 'center',
+  },
+  imageFrame: { //for the pressable that contains the images
+    width: 339,
+    height: 281,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  outfitImage: { // For actual image
+    width: 339,
+    height: 281,
+    resizeMode: 'contain',
+    
+  },
+  //-----------------------------content section-----------------------------
+  content: {
+    marginHorizontal: 22,
+    marginBottom: 20,
+  },
+  outputRow: {
+    marginBottom: 20,
+  },
+  flexRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  captionText: {
+    fontSize: 12,
+    color: '#9D4EDD',
+    marginBottom: 10,
+  },
+  outputText: {
+    color: '#666363',
+    paddingBottom: 5,
+    fontSize: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#666363',
+  },
 });
 
 export default DetailedOutfitScreen;
