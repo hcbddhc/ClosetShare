@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TextInput, Alert, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Import the hook
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import CustomStatusBar from '../components/CustomStatusBar';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import * as ImagePicker from 'expo-image-picker';
@@ -73,7 +75,11 @@ const OutfitCreationScreen = () => {
 
   //function for camera integration
   // Function to handle camera or image library selection
-const pickImage = async (imageIndex) => {
+const pickImage = async (uploadOption, imageIndex) => {
+  //uploadOption is a boolean to determine (for image picker) wheter the image is being saved as outfit image or piece image
+  //0: outfit image
+  //1: piece image
+
   const permissionGranted = await requestPermissions();
   if (!permissionGranted) return;
 
@@ -92,7 +98,7 @@ const pickImage = async (imageIndex) => {
             allowsEditing: true,
             aspect: [4, 3],
           });
-          handleImageResult(result, imageIndex);
+          handleImageResult(result, uploadOption, imageIndex);
         },
       },
       {
@@ -104,7 +110,7 @@ const pickImage = async (imageIndex) => {
             allowsEditing: true,
             aspect: [4, 3],
           });
-          handleImageResult(result, imageIndex);
+          handleImageResult(result, uploadOption, imageIndex);
         },
       },
     ]
@@ -112,20 +118,32 @@ const pickImage = async (imageIndex) => {
 };
 
 // Function to shrink the image from pickimage
-const handleImageResult = async (result, imageIndex) => {
+const handleImageResult = async (result, uploadOption, imageIndex) => {
   if (!result.canceled) {
     const manipulatedImage = await ImageManipulator.manipulateAsync(
       result.assets[0].uri,
       [{ resize: { width: 1024 } }], // make sure image is not too big, limit the size
       { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG } // same thing here, compress
     );
-
-    // update the image, go back to pick image
-    setOutfitImages((prevImages) => {
-      const updatedImages = [...prevImages];
-      updatedImages[imageIndex] = { uri: manipulatedImage.uri }; 
-      return updatedImages;
-    });
+    
+    //for outfit image
+    if (uploadOption === 0) {  // If it's an outfit image
+      setOutfitImages((prevImages) => {
+        const updatedImages = [...prevImages];
+        updatedImages[imageIndex] = { uri: manipulatedImage.uri }; 
+        return updatedImages;
+      });
+    } else if (uploadOption === 1) {  // If it's a piece image
+      setOutfitPieces((prevOutfitPieces) => {
+        const updatedOutfitPieces = [...prevOutfitPieces];
+        updatedOutfitPieces[imageIndex] = {
+          ...updatedOutfitPieces[imageIndex],  // keep other properties
+          image: { uri: manipulatedImage.uri },  // only update the image
+        };
+        return updatedOutfitPieces;
+      });
+    }
+    
   }
 };
 
@@ -146,6 +164,29 @@ const handleImageResult = async (result, imageIndex) => {
     setOutfitPieces(updatedPieces);
   };
 
+  //function that uploads an image to imgur, and returns a uri and delete hash.
+  const uploadImageToImgur = async (image) => {
+    if (!image?.uri) {
+      console.error("No image URI provided");
+      return null;
+    }
+  
+    try {
+      const imgurResponse = await uploadToImgur(image.uri);
+  
+      if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
+        console.log(`Image uploaded to Imgur: ${imgurResponse.link}`);
+        return { imageUrl: imgurResponse.link, deleteHash: imgurResponse.deleteHash };
+      } else {
+        console.error("Imgur response is missing link or deleteHash", imgurResponse);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error uploading image to Imgur:", error);
+      return null;
+    }
+  };
+
   //run when post button is pressed, 
   //compile the outfit object from user selection and inputs, and send to database
   const postOutfit = async () => {
@@ -153,13 +194,63 @@ const handleImageResult = async (result, imageIndex) => {
       // Retrieve the logged-in user's uid from AsyncStorage
       const user = await getData('user');
       const uid = user?.uid;
-  
       if (!uid) {
         console.error("User is not logged in. UID not found.");
         return;
       }
-  
-      console.log(outfitImages[0]?.uri); // for testing, ensure there are images before proceeding
+
+      // check image
+      if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
+        console.error("No outfit images provided");
+        return; // if no images it just ends
+      }
+
+      //start processing outfit images (outfitImages)
+      const processedOutfitImages = await Promise.all(
+        outfitImages.map(async (image) => {
+          // Check if the image is null or has no URI
+          if (!image || !image.uri) {
+            return null; // Skip processing if image is null or invalid
+          }
+          try {
+            const result = await uploadImageToImgur(image);
+            return result; // result will be null if upload fails or the image is invalid
+          } catch (error) {
+            console.error("Error uploading image to Imgur:", error);
+            return null;
+          }
+        })
+      );
+      //remove all the null pictures in case users left that empty
+      const validProcessedOutfitImages = processedOutfitImages.filter((image) => image !== null);
+
+      // Process outfit pieces images
+      const processedOutfitPieces = await Promise.all(
+        outfitPieces.map(async (piece) => {
+          if (!piece.image || !piece.image.uri) {
+            return null; // Skip processing if image is null or invalid
+          }
+          try {
+            const imageResult = await uploadImageToImgur(piece.image);
+            if (imageResult) {
+              return {
+                title: piece.title, // Retain the title
+                location: piece.location, // Retain the location
+                image: imageResult, // Add the image data
+              };
+            } else {
+              return null; // Return null if upload fails
+            }
+          } catch (error) {
+            console.error("Error uploading piece image to Imgur:", error);
+            return null;
+          }
+        })
+      );
+      
+
+      // Save the outfit data to Firestore with the user's UID yay
+      //outfit is the object that will be send to firebase
       const outfit = {
         name: outfitName,
         description: outfitDescription,
@@ -167,67 +258,30 @@ const handleImageResult = async (result, imageIndex) => {
         category: outfitCategory,
         bodyType: outfitBodyType,
         season: outfitSeason,
-        pieces: outfitPieces,
+        images: validProcessedOutfitImages,
+        pieces: processedOutfitPieces,
+        creationDate: new Date().toISOString().split('T')[0]
       };
-  
-      // check image
-      if (!outfitImages || outfitImages.length === 0 || outfitImages.every(img => img === null)) {
-        console.error("No outfit images provided");
-        return; // if no images it just ends
-      }
-  
-      //loop through all the user uploaded images and upload to imgur
-      const imgurData = await Promise.all(
-        outfitImages.map(async (image) => {
-          if (!image?.uri) return null; // if theres no uploaded images we end here
-  
-          try {
-            // actual imgur stuff here
-            const imgurResponse = await uploadToImgur(image.uri);
-            
-            //check if our function actually does the job (from imgur.js)
-            if (imgurResponse && imgurResponse.link && imgurResponse.deleteHash) {
-              const imgurLink = imgurResponse.link;
-              const deleteHash = imgurResponse.deleteHash;
-  
-              console.log(`Image uploaded to Imgur: ${imgurLink}`);
-              return { imageUrl: imgurLink, deleteHash }; // saves image URL and delete hash
-            } else {
-              console.error("Imgur response is missing link or deleteHash", imgurResponse);
-              return null;
-            }
-          } catch (error) {
-            console.error('Error uploading image to Imgur:', error);
-            return null;
-          }
-        })
-      );
-  
-      // filter out any failed uploads (null values), chatgpt says we need this sooooo
-      outfit.images = imgurData.filter((data) => data !== null);
-  
-      if (outfit.images.length === 0) {
-        console.error("No images uploaded to Imgur.");
-        return; 
-      }
-  
-      // Save the outfit data to Firestore with the user's UID yay
+
+      console.log("outfit uploaded: " + JSON.stringify(outfit));
+      
       const userOutfitsRef = collection(doc(db, "users", uid), "outfits");
       await addDoc(userOutfitsRef, outfit);
   
       console.log("Outfit added successfully!");
       navigation.navigate('Home');
+      
     } catch (error) {
       console.error("Error during outfit posting: ", error);
     }
   };
 
   const testtuff = async () => {
-    navigation.navigate('Home');
   };
 
   return (
-    <View style={styles.bigContainer}>
+    <SafeAreaProvider style={styles.bigContainer}>
+      <CustomStatusBar backgroundColor="white" />
       {/* ----------------------------header------------------------------*/}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -250,7 +304,7 @@ const handleImageResult = async (result, imageIndex) => {
               <Pressable
                 key={index}
                 style={styles.imageFrame}
-                onPress={() => pickImage(index)} // Pass the index to the pickImage function
+                onPress={() => pickImage(0, index)} // Pass the index to the pickImage function
               >
                 {image ? (
                   <Image style={styles.outfitImage} source={{ uri: image.uri }} />
@@ -353,15 +407,16 @@ const handleImageResult = async (result, imageIndex) => {
           {outfitPieces.map((piece, index) => (
             <View key={piece.id} style={styles.outfitPiece}>
 
-              <Pressable style={styles.pieceLeft}>
-                <Image
-                  style={styles.pieceImage}
-                  source={
-                    piece.image
-                      ? { uri: piece.image }
-                      : require('../../assets/outfitCreationImages/outfit piece upload.png')
-                  }
-                />
+              <Pressable
+                key={piece.id-1}
+                style={styles.pieceLeft}
+                onPress={() => pickImage(1, piece.id-1)} // Pass the index to the pickImage function
+              >
+                {outfitPieces[piece.id-1].image ? (
+                  <Image style={styles.pieceImage} source={{ uri: outfitPieces[piece.id-1].image.uri }} />
+                ) : (
+                  <Image style={styles.pieceImage} source={require('../../assets/outfitCreationImages/Add Outfit.png')} />
+                )}
               </Pressable>
 
               <View style={styles.pieceRight}>
@@ -400,7 +455,7 @@ const handleImageResult = async (result, imageIndex) => {
         </View>
         {/* ----------------------------end of content------------------------------*/}
       </ScrollView>
-    </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -408,22 +463,23 @@ const styles = StyleSheet.create({
   bigContainer: {
     flex: 1,
   },
-  scrollContainer: {
-    backgroundColor: '#F0F0F0',
-  },
+
+//-----------------------------header section-----------------------------
   header: {
     backgroundColor: '#FFFFFF',
-    paddingTop: 60,
-    paddingBottom: 25,
+    paddingTop: 20,
+    paddingBottom: 20,
     paddingHorizontal: 30,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  //left side (arrow + "create outfit")
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  //the post button
   postButton: {
     backgroundColor: '#9D4ECC',
     paddingHorizontal: 15,
@@ -432,13 +488,20 @@ const styles = StyleSheet.create({
     justifycontent: 'center',
     borderRadius: 10,
   },
+  //the post button text
   postButtonText: {
     color: 'white',
     fontSize: 18,
   },
+  // "create outfit" text
   h1: {
     fontSize: 24,
     color: '#666363',
+  },
+
+  //--------------------------add image section (where user add outfit image)-----------------------------
+  scrollContainer: {
+    backgroundColor: '#F0F0F0',
   },
   imageView: { //View that contains the whole image section
     flexDirection: 'row',
@@ -449,22 +512,25 @@ const styles = StyleSheet.create({
   imageScrollContainer: { //for the scrollView that contains all the images
     flexDireciton: 'row',
     alignContent: 'center',
-    paddingHorizontal: '2%',
   },
   imageFrame: { //for the pressable that contains the images
-    marginHorizontal: 10,
     width: 339,
     height: 281,
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 10,
   },
   outfitImage: { // For actual image
     width: 339,
     height: 281,
+    resizeMode: 'contain',
+    
   },
+
+  //-----------------------------content section-----------------------------
   content: {
-    marginHorizontal: 30,
-    paddingBottom: 50,
+    marginHorizontal: 22,
+    marginBottom: 20,
   },
   inputRow: {
     marginBottom: 20,
@@ -497,7 +563,8 @@ const styles = StyleSheet.create({
     width: '35%',
   },
   pieceImage: {
-    width: '100%',
+    width: 113,
+    height: 94,
   },
   pieceRight: {
     width: '50%',
@@ -507,9 +574,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addPiece: {
-    width: "83%",
-  },
   pieceText: {
     color: '#666363',
     paddingBottom: 5,
@@ -517,6 +581,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#666363',
+  },
+  addPiece: {
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+  },
+  addPieceImage: {
+    width: '100%',
+    resizeMode: 'contain',
   },
 });
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { Platform, View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';  // Import the hook
 
 const Footer = () => {
@@ -30,9 +30,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
     paddingHorizontal: '17%',
-    paddingVertical: 10,
-    borderTopWidth: 1, 
-    borderTopColor: '#666363', 
+    paddingTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+    shadowOffset: { width: 0, height: -4 },  
+    shadowColor: 'black',  
+    shadowOpacity: 0.1,  
+    elevation: 2,
   },
   footerOption: {
     alignItems: 'center',
