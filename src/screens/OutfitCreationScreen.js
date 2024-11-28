@@ -222,11 +222,15 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
             return null; // Skip processing if image is null or invalid
           }
           try {
-            if (piece.image) { // Only process if the image exists
-              const result = await uploadImageToImgur(piece.image);
-              return result; // result will be null if upload fails or the image is invalid
+            const imageResult = await uploadImageToImgur(piece.image);
+            if (imageResult) {
+              return {
+                title: piece.title, // Retain the title
+                location: piece.location, // Retain the location
+                image: imageResult, // Add the image data
+              };
             } else {
-              return null; // Return null if there is no image
+              return null; // Return null if upload fails
             }
           } catch (error) {
             console.error("Error uploading piece image to Imgur:", error);

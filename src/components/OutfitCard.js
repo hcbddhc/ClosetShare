@@ -47,7 +47,8 @@ const OutfitCard = ({ outfits }) => {
         // Pass both the outfit ID and the user ID to the next screen
         navigation.navigate('DetailedOutfit', {
             outfitId: outfitID.id,
-            userId: outfitID.userID
+            userId: outfitID.userID,
+            userName: outfits.username
         });
     };
 

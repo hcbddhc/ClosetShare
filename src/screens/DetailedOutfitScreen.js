@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TextInput, Alert, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {SafeAreaProvider, withSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomStatusBar from '../components/CustomStatusBar';
 
 import { collection, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 const DetailedOutfitScreen = ({ route }) => {
-    const { outfitId, userId } = route.params; // Destructure the outfitId and userId from route params
+    const { outfitId, userId, userName} = route.params; // Destructure the outfitId and userId from route params
     const [outfit, setOutfit] = useState(null);
     
     //navigation stuff
@@ -75,13 +75,16 @@ const DetailedOutfitScreen = ({ route }) => {
 
               {/* ----------------------------content------------------------------*/}
               <View style={styles.content}>
+                <View style={styles.outputRow}>
+                  <Text style={styles.outputText}>{userName}</Text>
+                </View>
                 {/* --------Description Field----------*/}
                 <View style={styles.outputRow}>
                   <Text style={styles.captionText}>Description</Text>
                   <Text style={styles.outputText}>{outfit.description}</Text>
                 </View>
 
-                {/* --------Height + Category Field----------*/}
+                {/* --------Other Fields----------*/}
                 <View style={[styles.outputRow, styles.flexRow]} >
                   <View style={styles.rowItem}>
                     <Text style={styles.captionText}>Height</Text>
@@ -91,10 +94,6 @@ const DetailedOutfitScreen = ({ route }) => {
                     <Text style={styles.captionText}>Category</Text>
                     <Text style={styles.outputText}>{outfit.category}</Text>
                   </View>
-                </View>
-
-                {/* --------Body Type + Outfit Season Field----------*/}
-                <View style={[styles.outputRow, styles.flexRow]}>
                   <View style={styles.rowItem}>
                     <Text style={styles.captionText}>Body Type</Text>
                     <Text style={styles.outputText}>{outfit.bodyType}</Text>
@@ -105,17 +104,31 @@ const DetailedOutfitScreen = ({ route }) => {
                   </View>
                 </View>
 
+            
                 {/* ----------------------------outfit pieces------------------------------*/}
-                <View style={styles.imageView}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.imageScrollContainer}>
-                  {outfit.pieces && outfit.pieces.length > 0 && outfit.pieces.map((piece, pieceIndex) => (
-                    piece.image && piece.image.length > 0 && piece.image.map((image, index) => (
-                      <View key={`${pieceIndex}-${index}`} style={styles.imageFrame}>
-                        <Image style={styles.outfitImage} source={{ uri: image.imageUrl }} />
+                <View>
+                  <Text style={styles.captionText}>Outfit Pieces</Text>
+                  {outfit.pieces.map((piece, index) => (
+                    <View key={piece.id || index} style={styles.outfitPiece}>
+                      <View style={styles.pieceLeft}>
+                        {piece.image?.imageUrl ? (
+                          <Image 
+                            style={styles.pieceImage} 
+                            source={{ uri: piece.image.imageUrl }} 
+                          />
+                        ) : (
+                          <Image 
+                            style={styles.pieceImage} 
+                            source={require('../../assets/outfitCreationImages/Add Outfit.png')} 
+                          />
+                        )}
                       </View>
-                    ))
+                      <View style={styles.pieceRight}>
+                        <Text style={styles.pieceTitle}>{piece.title || "Untitled Piece"}</Text>
+                        <Text style={styles.pieceLocation}>From: {piece.location || "Unknown Location"}</Text>
+                      </View>
+                    </View>
                   ))}
-                </ScrollView>
                 </View>
 
               </View>
@@ -154,7 +167,6 @@ const styles = StyleSheet.create({
   imageView: { //View that contains the whole image section
     flexDirection: 'row',
     alignContent: 'center',
-    marginBottom: 20,
     marginTop: 10,
   },
   imageScrollContainer: { //for the scrollView that contains all the images
@@ -180,23 +192,58 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   outputRow: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   flexRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    gap: '10%', 
   },
   captionText: {
     fontSize: 12,
     color: '#9D4EDD',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   outputText: {
-    color: '#666363',
     paddingBottom: 5,
     fontSize: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#666363',
+  },
+   //-----------------------------outfit pieces-----------------------------
+  outfitPiece: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    alignItems: 'center',
+    borderRadius: 10,
+    shadowOffset: { width: 0, height: 1 },  
+    shadowColor: 'black',  
+    shadowOpacity: 0.2,  
+    elevation: 3, 
+  },
+  pieceLeft: {
+    width: '35%',
+  },
+  pieceImage: {
+    width: 113,
+    height: 94,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  pieceRight: {
+    width: '60%',
+    paddingVertical: 10,
+    paddingRight: 20,
+  },
+  pieceTitle: {
+    color: '#9D4EDD',
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  pieceLocation: {
+    paddingBottom: 5,
+    fontSize: 14,
+    color: '#666363',
   },
 });
 
