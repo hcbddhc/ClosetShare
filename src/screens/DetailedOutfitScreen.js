@@ -109,7 +109,7 @@ const DetailedOutfitScreen = ({ route }) => {
                 <View>
                   <Text style={styles.captionText}>Outfit Pieces</Text>
                   {outfit.pieces.map((piece, index) => (
-                    <View key={piece.id || index} style={styles.outfitPiece}>
+                    <Pressable key={piece.id || index} style={styles.outfitPiece}>
                       <View style={styles.pieceLeft}>
                         {piece.image?.imageUrl ? (
                           <Image 
@@ -127,7 +127,7 @@ const DetailedOutfitScreen = ({ route }) => {
                         <Text style={styles.pieceTitle}>{piece.title || "Untitled Piece"}</Text>
                         <Text style={styles.pieceLocation}>From: {piece.location || "Unknown Location"}</Text>
                       </View>
-                    </View>
+                    </Pressable>
                   ))}
                 </View>
 
