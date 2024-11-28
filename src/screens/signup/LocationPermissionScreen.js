@@ -17,6 +17,7 @@ const LocationPermissionScreen = ({ navigation, route }) => {
         onPress={() =>
           navigation.navigate('SetLocation', { gender, height, weight })
         }
+        style={styles.yesButton}
       />
       <DefaultButton
         title="No"
@@ -47,7 +48,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   noButton: {
-    marginTop: 10,
+    marginTop: 0,
+    width: 250,
+    backgroundColor: '#D9D9D9',
+  },
+  yesButton: {
+    marginTop: 20,
+    width: 250,
   },
 });
 

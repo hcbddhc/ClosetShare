@@ -1,38 +1,45 @@
 // src/screens/signup/WeightScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Input from '../../components/Input';
+import { Picker } from '@react-native-picker/picker';
 import DefaultButton from '../../components/DefaultButton';
 
 const WeightScreen = ({ navigation, route }) => {
-
-    const [weight, setWeight] = useState('');
+    const [selectedBodySize, setSelectedBodySize] = useState('');
     const { gender, height } = route.params;
 
+    const weight = ['Curvy', 'Slim', 'Athletic', 'Petite', 'Plus-size'];
+
     const handleNext = () => {
-        if (weight) {
-          navigation.navigate('LocationPermission', { gender, height, weight });
+        if (selectedBodySize) {
+            navigation.navigate('LocationPermission', { gender, height, weight: selectedBodySize });
         } else {
-          alert('Please enter your weight.');
+            alert('Please select your body size.');
         }
     };
-      
+
     return (
-    <View style={styles.container}>
-        <Text style={styles.title}>What’s your Weight?</Text>
-        <Text style={styles.description}>
-        Enter your weight to personalize size recommendations.
-        </Text>
+        <View style={styles.container}>
+            <Text style={styles.title}>What’s your Body Size?</Text>
+            <Text style={styles.description}>
+                Select your body size to personalize size recommendations.
+            </Text>
 
-        <Input
-            label=""
-            placeholder="Enter weight in kg or lbs"
-            value={weight}
-            onChangeText={setWeight}
-        />
+            <View style={styles.pickerContainer}>
+                <Picker
+                    selectedValue={selectedBodySize}
+                    onValueChange={(itemValue) => setSelectedBodySize(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Select your body size" value="" />
+                    {weight.map((size, index) => (
+                        <Picker.Item key={index} label={size} value={size} />
+                    ))}
+                </Picker>
+            </View>
 
-        <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />
-    </View>
+            <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />
+        </View>
     );
 };
 
@@ -50,21 +57,32 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: '#493d8a',
         marginBottom: 10,
-        textAlign:'center',
+        textAlign: 'center',
     },
     description: {
-        fontWeight:'600',
+        fontWeight: '600',
         color: '#62656b',
         textAlign: 'center',
         paddingHorizontal: 64,
     },
+    pickerContainer: {
+        width: '80%',
+        marginVertical: 20,
+        borderColor: '#ddd',
+        borderWidth: 1,
+        borderRadius: 8,
+        overflow: 'hidden',
+        marginTop: 50,
+        marginBottom: 25,
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
     nextButton: {
         marginTop: 20,
-        width: '80%',
+        width: 250,
     },
 });
 
 export default WeightScreen;
-
-
-

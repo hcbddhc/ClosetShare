@@ -72,7 +72,7 @@ const SignupScreen = ({ onLoginStateChange, navigation, route }) => {
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <DefaultButton title="Complete Signup" onPress={handleSignUp} />
+      <DefaultButton title="Complete Signup" onPress={handleSignUp} style={styles.nextButton}/>
     </View>
   );
 };
@@ -96,6 +96,10 @@ const styles = StyleSheet.create({
     error: {
       color: 'red',
       marginVertical: 10,
+    },
+    nextButton: {
+      marginTop: 20,
+      width: 250,
     },
 });
 

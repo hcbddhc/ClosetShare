@@ -6,10 +6,31 @@ import Footer from '../components/Footer';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
+import { removeData } from '../utils/storage';
 
 
-const HomeScreen = (navigation) => {
+const HomeScreen = ({ navigation, onLoginStateChange }) => {
   const [outfits, setOutfits] = useState([]);
+  const handleLogout = async () => {
+    console.log('Logout triggered');
+    await removeData('user');
+    onLoginStateChange(); 
+ 
+    setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }, 150); 
+  };
+ 
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('HomeScreen gained focus');
+      onLoginStateChange(); 
+    }, [])
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -83,7 +104,14 @@ const HomeScreen = (navigation) => {
        {/* ------------------------------------------Header------------------------------------------------------- */}
       <View style= {styles.header}>
         {/* Logo */}
-        <Text style={styles.logo}>CLOSET SHARE.</Text>
+        <View style ={styles.flexIcon}>
+          {/* Logo */}
+          <Text style={styles.logo}>CLOSET SHARE.</Text>
+          <Pressable onPress={handleLogout} style={styles.logoutButton}>
+            <Image style={styles.logoutButtonImage} source={require('../../assets/HomeScreenImages/LogoutIcon.png') } />
+          </Pressable>
+        </View>
+        
 
         {/* Search Bar */}
         <View style = {styles.search}>
@@ -147,8 +175,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
-
+  flexIcon: {
+    flexDirection:'row',
+    justifyContent:'space-between',
+    marginRight:20,
+  },
   header: {
     backgroundColor: '#FFFFFF',
     paddingTop: 56,
@@ -160,6 +191,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#9D4EDD', 
     marginBottom: 16,
+  },
+  logoutButton: {
+    marginLeft: 10,
+  },
+  logoutButtonImage:{
+    height:35,
+    width:35,
   },
   search: {
     flexDirection: 'row',

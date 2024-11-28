@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     },
     customButton: {
         width: 250,  
-        marginVertical: 15,
+        marginVertical: 10,
     },
     buttonContainer: {
         marginVertical: 15,

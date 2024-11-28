@@ -54,7 +54,7 @@ const SetLocationScreen = ({ navigation, route }) => {
                 {location && <Marker coordinate={location} draggable />}
             </MapView>
         )}
-        <DefaultButton title="Confirm" onPress={handleConfirm} />
+        <DefaultButton title="Confirm" onPress={handleConfirm} style={styles.yesButton} />
     </View>
   );
 };
@@ -65,6 +65,11 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  yesButton: {
+    marginTop: 25, 
+    width: 250,
+    alignSelf: 'center', 
   },
 });
 

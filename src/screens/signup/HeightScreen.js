@@ -1,38 +1,46 @@
 // src/screens/signup/HeightScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Input from '../../components/Input';
+import { Picker } from '@react-native-picker/picker';
 import DefaultButton from '../../components/DefaultButton';
 
 const HeightScreen = ({ navigation, route }) => {
-
-    const [height, setHeight] = useState('');
+    const [selectedHeight, setSelectedHeight] = useState('');
     const { gender } = route.params;
 
+    const heightRanges = [
+        '155-159', '160-164', '165-169', '170-174', '175-179', '180-184'
+    ]; 
 
     const handleNext = () => {
-        if (height) {
-        navigation.navigate('Weight', { gender, height });
+        if (selectedHeight) {
+            navigation.navigate('Weight', { gender, height: selectedHeight });
         } else {
-        alert("Please enter your height.");
+            alert('Please select your height.');
         }
     };
 
     return (
         <View style={styles.container}>
-        <Text style={styles.title}>What’s your Height?</Text>
-        <Text style={styles.description}>
-            Enter your height to help us find the right fit for you.
-        </Text>
+            <Text style={styles.title}>What’s your Height?</Text>
+            <Text style={styles.description}>
+                Select your height range to help us find the right fit for you.
+            </Text>
 
-        <Input
-            label=""
-            placeholder="Enter height in cm or ft/in"
-            value={height}
-            onChangeText={setHeight}
-        />
+            <View style={styles.pickerContainer}>
+                <Picker
+                    selectedValue={selectedHeight}
+                    onValueChange={(itemValue) => setSelectedHeight(itemValue)}
+                    style={styles.picker}
+                >
+                    <Picker.Item label="Select your height range (cm)" value="" />
+                    {heightRanges.map((range, index) => (
+                        <Picker.Item key={index} label={range} value={range} />
+                    ))}
+                </Picker>
+            </View>
 
-        <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />
+            <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />
         </View>
     );
 };
@@ -51,20 +59,31 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: '#493d8a',
         marginBottom: 10,
-        textAlign:'center',
+        textAlign: 'center',
     },
     description: {
-        fontWeight:'600',
+        fontWeight: '600',
         color: '#62656b',
         textAlign: 'center',
         paddingHorizontal: 64,
     },
+    pickerContainer: {
+        width: '80%',
+        marginTop: 50,
+        marginBottom: 25,
+        borderColor: '#ddd',
+        borderWidth: 1,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
     nextButton: {
         marginTop: 20,
-        width: '80%',
+        width: 250,
     },
 });
 
 export default HeightScreen;
-
-

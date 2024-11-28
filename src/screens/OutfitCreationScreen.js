@@ -29,7 +29,7 @@ const OutfitCreationScreen = () => {
     { id: 1, title: '', location: '', image: null },
   ]);
 
-  //choices for the 3 drop down menu selections
+  //choices for the 4 drop down menu selections
   const categorySelection = [
     { label: 'Men', value: 'men' },
     { label: 'Women', value: 'women' },
@@ -48,6 +48,15 @@ const OutfitCreationScreen = () => {
     { label: 'Fall', value: 'fall' },
     { label: 'Winter', value: 'winter' },
     { label: 'Year-round', value: 'year-round' },
+  ];
+  const heightSelection = [
+    { label: '155-159 cm', value: '155-159' },
+    { label: '160-164 cm', value: '160-164' },
+    { label: '165-169 cm', value: '165-169' },
+    { label: '170-174 cm', value: '170-174' },
+    { label: '175-179 cm', value: '175-179' },
+    { label: '180-184 cm', value: '180-184' },
+    { label: 'none', value: 'none' },
   ];
 
   //ask for permission when doing image stuff
@@ -278,15 +287,20 @@ const handleImageResult = async (result, imageIndex) => {
             />
           </View>
 
-          {/* --------Height + Category Field----------*/}
-          <View style={[styles.inputRow, styles.flexRow]} >
+          {/* --------Height + Category Field---------- */}
+          <View style={[styles.inputRow, styles.flexRow]}>
+            {/* Height Dropdown */}
             <View style={styles.rowItem}>
               <Text style={styles.captionText}>Height</Text>
-              <TextInput
+              <Dropdown
                 style={styles.inputText}
-                placeholder="Add Height......"
+                iconColor="#9D4EDD"
+                data={heightSelection}
+                labelField="label"
+                valueField="value"
                 value={outfitHeight}
-                onChangeText={setOutfitHeight}
+                onChange={(item) => setOutfitHeight(item.value)}
+                placeholder="Add Height"
               />
             </View>
             <View style={styles.rowItem}>
@@ -298,7 +312,7 @@ const handleImageResult = async (result, imageIndex) => {
                 labelField="label"
                 valueField="value"
                 value={outfitCategory}
-                onChange={item => setOutfitCategory(item.value)}
+                onChange={(item) => setOutfitCategory(item.value)}
                 placeholder="Add Category"
               />
             </View>
