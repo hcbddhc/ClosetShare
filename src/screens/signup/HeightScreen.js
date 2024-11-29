@@ -1,7 +1,6 @@
-// src/screens/signup/HeightScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import DefaultButton from '../../components/DefaultButton';
 
 const HeightScreen = ({ navigation, route }) => {
@@ -9,8 +8,13 @@ const HeightScreen = ({ navigation, route }) => {
     const { gender } = route.params;
 
     const heightRanges = [
-        '155-159', '160-164', '165-169', '170-174', '175-179', '180-184'
-    ]; 
+        { label: '155-159 cm', value: '155-159' },
+        { label: '160-164 cm', value: '160-164' },
+        { label: '165-169 cm', value: '165-169' },
+        { label: '170-174 cm', value: '170-174' },
+        { label: '175-179 cm', value: '175-179' },
+        { label: '180-184 cm', value: '180-184' },
+    ];
 
     const handleNext = () => {
         if (selectedHeight) {
@@ -27,18 +31,15 @@ const HeightScreen = ({ navigation, route }) => {
                 Select your height range to help us find the right fit for you.
             </Text>
 
-            <View style={styles.pickerContainer}>
-                <Picker
-                    selectedValue={selectedHeight}
-                    onValueChange={(itemValue) => setSelectedHeight(itemValue)}
-                    style={styles.picker}
-                >
-                    <Picker.Item label="Select your height range (cm)" value="" />
-                    {heightRanges.map((range, index) => (
-                        <Picker.Item key={index} label={range} value={range} />
-                    ))}
-                </Picker>
-            </View>
+            <Dropdown
+                style={styles.dropdown}
+                data={heightRanges}
+                labelField="label"
+                valueField="value"
+                placeholder="Select your height range (cm)"
+                value={selectedHeight}
+                onChange={(item) => setSelectedHeight(item.value)}
+            />
 
             <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />
         </View>
@@ -67,18 +68,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingHorizontal: 64,
     },
-    pickerContainer: {
+    dropdown: {
         width: '80%',
-        marginTop: 50,
-        marginBottom: 25,
+        marginTop: 20,
         borderColor: '#ddd',
         borderWidth: 1,
         borderRadius: 8,
-        overflow: 'hidden',
-    },
-    picker: {
-        height: 50,
-        width: '100%',
+        padding: 10,
     },
     nextButton: {
         marginTop: 20,

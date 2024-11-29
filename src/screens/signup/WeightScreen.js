@@ -1,14 +1,19 @@
-// src/screens/signup/WeightScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { Dropdown } from 'react-native-element-dropdown';
 import DefaultButton from '../../components/DefaultButton';
 
 const WeightScreen = ({ navigation, route }) => {
     const [selectedBodySize, setSelectedBodySize] = useState('');
     const { gender, height } = route.params;
 
-    const weight = ['Curvy', 'Slim', 'Athletic', 'Petite', 'Plus-size'];
+    const weightOptions = [
+        { label: 'Curvy', value: 'Curvy' },
+        { label: 'Slim', value: 'Slim' },
+        { label: 'Athletic', value: 'Athletic' },
+        { label: 'Petite', value: 'Petite' },
+        { label: 'Plus-size', value: 'Plus-size' },
+    ];
 
     const handleNext = () => {
         if (selectedBodySize) {
@@ -25,18 +30,15 @@ const WeightScreen = ({ navigation, route }) => {
                 Select your body size to personalize size recommendations.
             </Text>
 
-            <View style={styles.pickerContainer}>
-                <Picker
-                    selectedValue={selectedBodySize}
-                    onValueChange={(itemValue) => setSelectedBodySize(itemValue)}
-                    style={styles.picker}
-                >
-                    <Picker.Item label="Select your body size" value="" />
-                    {weight.map((size, index) => (
-                        <Picker.Item key={index} label={size} value={size} />
-                    ))}
-                </Picker>
-            </View>
+            <Dropdown
+                style={styles.dropdown}
+                data={weightOptions}
+                labelField="label"
+                valueField="value"
+                placeholder="Select your body size"
+                value={selectedBodySize}
+                onChange={(item) => setSelectedBodySize(item.value)}
+            />
 
             <DefaultButton title="Next" onPress={handleNext} style={styles.nextButton} />
         </View>
@@ -65,19 +67,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingHorizontal: 64,
     },
-    pickerContainer: {
+    dropdown: {
         width: '80%',
-        marginVertical: 20,
+        marginTop: 20,
         borderColor: '#ddd',
         borderWidth: 1,
         borderRadius: 8,
-        overflow: 'hidden',
-        marginTop: 50,
-        marginBottom: 25,
-    },
-    picker: {
-        height: 50,
-        width: '100%',
+        padding: 10,
     },
     nextButton: {
         marginTop: 20,
