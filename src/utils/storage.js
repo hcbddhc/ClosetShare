@@ -1,4 +1,4 @@
-// src\utils\storage.js
+//E:\SFU\IAT 359\ClosetShare\src\utils\storage.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const saveData = async (key, value) => {
@@ -23,5 +23,23 @@ export const removeData = async (key) => {
     await AsyncStorage.removeItem(key);
   } catch (error) {
     console.error('Error removing data', error);
+  }
+};
+
+export const saveOutfitID = async (outfitID) => {
+  try {
+    await AsyncStorage.setItem('currentOutfitID', outfitID);
+  } catch (error) {
+    console.error('Error saving outfitID:', error);
+  }
+};
+
+export const getOutfitID = async () => {
+  try {
+    const outfitID = await AsyncStorage.getItem('currentOutfitID');
+    return outfitID;
+  } catch (error) {
+    console.error('Error retrieving outfitID:', error);
+    return null;
   }
 };

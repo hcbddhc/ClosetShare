@@ -3,6 +3,7 @@ import { View, Text, Image, TextInput, Alert, ScrollView, Pressable, StyleSheet 
 import { useNavigation } from '@react-navigation/native';
 import {SafeAreaProvider, withSafeAreaInsets} from 'react-native-safe-area-context';
 import CustomStatusBar from '../components/CustomStatusBar';
+import { saveOutfitID } from '../utils/storage';
 
 import { collection, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
@@ -16,6 +17,10 @@ const DetailedOutfitScreen = ({ route }) => {
 
     useEffect(() => {
         const fetchOutfit = async () => {
+            if (!outfitId || !userId) {
+              console.error("Missing outfitId or userId. Cannot fetch outfit.");
+              return;
+            }
             try {
               //the query: find the exact outfit in the firestore database using the passed user id and outfit id
               const outfitRef = doc(db, 'users', userId, 'outfits', outfitId);
@@ -105,11 +110,23 @@ const DetailedOutfitScreen = ({ route }) => {
                 </View>
 
             
-                {/* ----------------------------outfit pieces------------------------------*/}
+                {/* ----------------------------Outfit Pieces------------------------------ */}
                 <View>
                   <Text style={styles.captionText}>Outfit Pieces</Text>
                   {outfit.pieces.map((piece, index) => (
-                    <Pressable key={piece.id || index} style={styles.outfitPiece}>
+                    <Pressable
+                      key={piece.id || index}
+                      style={styles.outfitPiece}
+                      onPress={() => {
+                        if (piece.location === "Unknown Location" || !piece.location) {
+                          Alert.alert("Invalid Location", "This outfit piece does not have a valid location.");
+                        } else {
+                          saveOutfitID(outfitId); // Save outfitId temporarily
+                          navigation.navigate('Navigation', { pieceLocation: piece.location, userId, outfitId });
+                        }
+                      }}                  
+                      
+                    >
                       <View style={styles.pieceLeft}>
                         {piece.image?.imageUrl ? (
                           <Image 
@@ -130,6 +147,7 @@ const DetailedOutfitScreen = ({ route }) => {
                     </Pressable>
                   ))}
                 </View>
+
 
               </View>
 
@@ -245,6 +263,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666363',
   },
+  addPieceButton: {
+  marginTop: 20,
+  paddingVertical: 10,
+  paddingHorizontal: 15,
+  backgroundColor: '#9D4EDD',
+  borderRadius: 8,
+  alignItems: 'center',
+  justifyContent: 'center',
+  shadowOffset: { width: 0, height: 2 },
+  shadowColor: 'black',
+  shadowOpacity: 0.2,
+  elevation: 5,
+},
+addPieceButtonText: {
+  color: 'white',
+  fontSize: 16,
+  fontWeight: '600',
+},
 });
 
 export default DetailedOutfitScreen;

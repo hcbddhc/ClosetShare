@@ -14,7 +14,7 @@ import SetLocationScreen from './src/screens/signup/SetLocationScreen';
 import SignupScreen from './src/screens/signup/SignupScreen';
 import OutfitCreationScreen from './src/screens/OutfitCreationScreen';
 import DetailedOutfitScreen from './src/screens/DetailedOutfitScreen';
-
+import NavigationScreen from './src/screens/Navigation'; // Import the new Navigation screen
 
 const Stack = createNativeStackNavigator();
 
@@ -54,6 +54,11 @@ export default function App() {
             <Stack.Screen
               name="DetailedOutfit"
               component={DetailedOutfitScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Navigation"
+              component={NavigationScreen}
               options={{ headerShown: false }}
             />
           </>
@@ -102,7 +107,6 @@ export default function App() {
             />
             <Stack.Screen name="Signup"
               options={{ headerShown: false }}>{(props) => <SignupScreen {...props} onLoginStateChange={checkLoginStatus} />}</Stack.Screen>
-            
           </>
         )}
       </Stack.Navigator>
