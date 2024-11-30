@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         borderRadius: 8,
         width: '48%', // Adjust the width to fit two items per row (slightly less than half the screen width)
-        height: 270,
         marginBottom: 15,
         shadowOffset: { width: 0, height: 1 },  
         shadowColor: 'black',  
@@ -146,12 +145,13 @@ const styles = StyleSheet.create({
         padding: 10,
       },
       outfitName: {
-        fontSize: 14,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontFamily: 'Nunito_800ExtraBold',
       },
       outfitUserName: {
         color: '#9D4EDD',
         marginBottom: 20,
+        fontFamily: 'Nunito_300Light',
       },
       outfitCardBottom: {
         flexDirection: 'row',
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
       },
       outfitDate: {
         color: '#666363',
+        fontFamily: 'Nunito_300Light',
       },
 });
 

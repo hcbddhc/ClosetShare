@@ -491,11 +491,13 @@ const styles = StyleSheet.create({
   //the post button text
   postButtonText: {
     color: 'white',
+    fontFamily: 'Poppins_600SemiBold',
     fontSize: 18,
   },
   // "create outfit" text
   h1: {
     fontSize: 24,
+    fontFamily: 'Poppins_500Medium',
     color: '#666363',
   },
 
@@ -544,6 +546,7 @@ const styles = StyleSheet.create({
   },
   captionText: {
     fontSize: 12,
+    fontFamily: 'Nunito_300Light',
     color: '#9D4EDD',
     marginBottom: 10,
   },
@@ -551,6 +554,7 @@ const styles = StyleSheet.create({
     color: '#666363',
     paddingBottom: 5,
     fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
     borderBottomWidth: 1,
     borderBottomColor: '#666363',
   },

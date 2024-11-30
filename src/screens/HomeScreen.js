@@ -6,7 +6,6 @@ import CustomStatusBar from '../components/CustomStatusBar';
 import OutfitCard from '../components/OutfitCard';
 import { View, Text, Image, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import { useFonts, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getData } from '../utils/storage'; 
@@ -81,125 +80,95 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
   ];
 
   //refresh list of outfits on load
-useFocusEffect(
-  useCallback(() => {
-    const fetchData = async () => {
-      try {
-        // If navigationMode is 2, we want to fetch only the liked outfits of the current user
-        if (navigationMode === 2) {
-          // Get the current logged-in user's UID
-          const user = await getData('user');
-          const uid = user?.uid;
-
-          if (!uid) {
-            console.log("User is not logged in");
-            setOutfits([]); // If no user is logged in, return empty
-            return;
-          }
-
-          // Get the user's document from the 'users' collection
-          const userDoc = await getDoc(doc(db, 'users', uid));
-          const favoriteOutfits = userDoc.data().favoriteOutfits || [];
-
-          // If no liked outfits, return empty
-          if (favoriteOutfits.length === 0) {
-            setOutfits([]); 
-            return;
-          }
-
-          // Fetch details for each outfit that the user has liked by looping through all users' outfits
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        try {
           let fetchedData = [];
-
-          // Fetch all users
+  
+          // Fetch all users from database
           const usersList = await getDocs(collection(db, 'users'));
+  
+          //-------------------- navigation Mode is EXPLORE---------------------------
+          if (navigationMode === 1 || navigationMode === 3) {
+            for (const userDoc of usersList.docs) {
+              let outfitsQuery = collection(db, `users/${userDoc.id}/outfits`);
+  
+              // Apply filters based on the selected criteria
+              if (filterSeason) outfitsQuery = query(outfitsQuery, where("season", "==", filterSeason));
+              if (filterCategory) outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
+              if (filterBodyType) outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
+  
+              const outfitsList = await getDocs(outfitsQuery); // Fetch outfits based on query
+  
+              // Process each outfit document
+              outfitsList.forEach((outfitDoc) => {
+                fetchedData.push({
+                  id: outfitDoc.id,
+                  userID: userDoc.id,
+                  outfitName: outfitDoc.data().name,
+                  username: userDoc.data().username || "Anonymous", // Fallback
+                  creationDate: outfitDoc.data().creationDate || "Unknown",
+                  image: outfitDoc.data().images?.[0]?.imageUrl,
+                });
+              });
+            }
 
-          console.log("Users list:", usersList); // Log the entire users list for debugging
-
-          for (const userDoc of usersList.docs) {
-            // Check if the user has an 'outfits' field
-            const outfitsRef = collection(db, `users/${userDoc.id}/outfits`); // Reference to the user's subcollection of outfits
-            const outfitsSnapshot = await getDocs(outfitsRef);
-            const userOutfits = outfitsSnapshot.docs.map(doc => doc.id); 
-
-            // Loop through each outfit in the current user
-            for (const outfit of userOutfits) {
-
-              // Check if the outfit's UID (outfit) matches the liked outfit ID
-              if (favoriteOutfits.includes(outfit)) {
-
-               
-                const outfitDoc = await getDoc(doc(db, `users/${userDoc.id}/outfits/${outfit}`));// Outfit ID is the UID here
-
-                if (outfitDoc.exists()) {
-                  fetchedData.push({
-                    id: outfitDoc.id, 
-                    outfitName: outfitDoc.data().name,
-                    creationDate: outfitDoc.data().creationDate || "Unknown",
-                    image: outfitDoc.data().images?.[0]?.imageUrl,
-                  });
+          //-------------------- navigation Mode is FAVORITES---------------------------
+          } else if (navigationMode === 2) {
+            const user = await getData('user');
+            const uid = user?.uid;
+  
+            if (!uid) {
+              console.log("User is not logged in");
+              setOutfits([]); // If no user is logged in, return empty
+              return;
+            }
+  
+            const userDoc = await getDoc(doc(db, 'users', uid));
+            const favoriteOutfits = userDoc.data().favoriteOutfits || [];
+  
+            // If no liked outfits, return empty
+            if (favoriteOutfits.length === 0) {
+              setOutfits([]); 
+              return;
+            }
+  
+            // Loop through users and check their outfits for liked outfits
+            for (const userDoc of usersList.docs) {
+              const outfitsRef = collection(db, `users/${userDoc.id}/outfits`);
+              const outfitsSnapshot = await getDocs(outfitsRef);
+              const userOutfits = outfitsSnapshot.docs.map(doc => doc.id); 
+  
+              // Loop through each outfit and check if it's liked by the current user
+              for (const outfit of userOutfits) {
+                if (favoriteOutfits.includes(outfit)) {
+                  const outfitDoc = await getDoc(doc(db, `users/${userDoc.id}/outfits/${outfit}`));
+                  if (outfitDoc.exists()) {
+                    const username = userDoc.data().username || "Anonymous"; // Fallback
+                    fetchedData.push({
+                      id: outfitDoc.id, 
+                      outfitName: outfitDoc.data().name,
+                      creationDate: outfitDoc.data().creationDate || "Unknown",
+                      image: outfitDoc.data().images?.[0]?.imageUrl,
+                      username: username
+                    });
+                  }
                 }
               }
             }
           }
-          setOutfits(fetchedData); // Set the liked outfits
-          return; // Exit early after fetching liked outfits
+  
+          // SETTING OUTFIT AFTER 1 2 OR 3
+          setOutfits(fetchedData);
+  
+        } catch (error) {
+          console.error('Error fetching data:', error);
         }
-
-        // If navigationMode is 1 or 3, fetch all outfits as usual
-        const usersList = await getDocs(collection(db, 'users'));
-        let fetchedData = [];
-
-        // Loop through each user document
-        for (const userDoc of usersList.docs) {
-          // Retrieve all the outfits for each user
-          let outfitsQuery = collection(db, `users/${userDoc.id}/outfits`);
-
-          // Apply filters
-          if (filterSeason) {
-            outfitsQuery = query(outfitsQuery, where("season", "==", filterSeason));
-          }
-          if (filterCategory) {
-            outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
-          }
-          if (filterBodyType) {
-            outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
-          }
-
-          const outfitsList = await getDocs(outfitsQuery); // Fetch outfits based on query
-
-          // Process each outfit document
-          outfitsList.forEach((outfitDoc) => {
-            fetchedData.push({
-              id: outfitDoc.id, // This is the outfit's UID
-              userID: userDoc.id,
-              outfitName: outfitDoc.data().name,
-              username: userDoc.data().username || "Anonymous", // Fallback
-              creationDate: outfitDoc.data().creationDate || "Unknown",
-              image: outfitDoc.data().images?.[0]?.imageUrl,
-            });
-          });
-        }
-
-        // Set the fetched data as the outfits state
-        setOutfits(fetchedData);
-
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, [navigationMode, filterSeason, filterCategory, filterBodyType])
-);
-
-
-  // Load Poppins font
-  const [fontsLoaded] = useFonts({
-    Poppins_700Bold,
-  });
-  if (!fontsLoaded) {
-    return null;
-  }
+      };
+      fetchData();
+    }, [navigationMode, filterSeason, filterCategory, filterBodyType])
+  );
 
    // function for rendering outfit
    const renderOutfitCards = () => {
@@ -312,7 +281,7 @@ const styles = StyleSheet.create({
   flexIcon: {
     flexDirection:'row',
     justifyContent:'space-between',
-    marginRight:20,
+    marginRight: 20,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -366,6 +335,7 @@ const styles = StyleSheet.create({
   filterText: {
     color: '#666363',
     fontSize: 14,
+    fontFamily: 'Nunito_400Regular',
   },
   filterOption: {
     alignItems: 'center',
@@ -393,6 +363,7 @@ const styles = StyleSheet.create({
     marginHorizontal: '6%',
   },
   contentOptionText: { //text for each option
+    fontFamily: 'Poppins_600SemiBold',
     fontSize: 16,
     paddingBottom: 15,
   },

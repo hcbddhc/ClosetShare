@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useFonts, Poppins_700Bold, Poppins_600SemiBold, Poppins_500Medium } from '@expo-google-fonts/poppins';
+import { Nunito_400Regular, Nunito_800ExtraBold, Nunito_300Light } from '@expo-google-fonts/nunito';
+import AppLoading from 'expo-app-loading';
+
 import { getData } from './src/utils/storage';
 import LoginScreen from './src/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
@@ -33,6 +37,19 @@ export default function App() {
   useEffect(() => {
     console.log('isLoggedIn state:', isLoggedIn);
   }, [isLoggedIn]);
+
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_600SemiBold,
+    Poppins_500Medium,
+    Nunito_400Regular,
+    Nunito_800ExtraBold,
+    Nunito_300Light,
+  });
+
+  if (!fontsLoaded) {
+    return <AppLoading />;
+  }
   
 
   return (
