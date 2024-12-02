@@ -145,13 +145,13 @@ const HomeScreen = () => {
                 if (favoriteOutfits.includes(outfit)) {
                   const outfitDoc = await getDoc(doc(db, `users/${userDoc.id}/outfits/${outfit}`));
                   if (outfitDoc.exists()) {
-                    const username = userDoc.data().username || "Anonymous"; // Fallback
                     fetchedData.push({
-                      id: outfitDoc.id, 
+                      id: outfitDoc.id,
+                      userID: userDoc.id,
                       outfitName: outfitDoc.data().name,
+                      username: userDoc.data().username || "Anonymous", // Fallback
                       creationDate: outfitDoc.data().creationDate || "Unknown",
                       image: outfitDoc.data().images?.[0]?.imageUrl,
-                      username: username
                     });
                   }
                 }
