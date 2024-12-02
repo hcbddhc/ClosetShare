@@ -59,7 +59,7 @@ const DetailedOutfitScreen = ({ route }) => {
             {/* ----------------------------header------------------------------*/}
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                <Pressable onPress={() => navigation.navigate('Home')}>
+                <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Image source={require('../../assets/outfitCreationImages/back button.png')} />
                 </Pressable>
                 <Text style={styles.h1}>{outfit.name}</Text>
@@ -202,7 +202,6 @@ const styles = StyleSheet.create({
     width: 339,
     height: 281,
     resizeMode: 'contain',
-    
   },
   //-----------------------------content section-----------------------------
   content: {

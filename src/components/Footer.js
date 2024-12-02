@@ -1,71 +1,83 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Platform, View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const Footer = () => {
-  const [selectedTab, setSelectedTab] = useState('Home');  // Track selected tab
+const Footer = ({ activeTab }) => {
   const navigation = useNavigation();
 
   const handlePress = (tab) => {
-    setSelectedTab(tab);  // Set selected tab when pressed
     if (tab === 'Home') {
-      navigation.navigate('Home');  // Navigate to Home screen
+      navigation.navigate('Home'); // Navigate to Home screen
     } else if (tab === 'Post') {
-      navigation.navigate('OutfitCreation');  // Navigate to Post screen
-    } else {
-      navigation.navigate('Profile');  // Navigate to Profile screen
+      navigation.navigate('OutfitCreation', {
+        onReturn: () => navigation.navigate('Home'), // Return to Home after posting
+      });
+    } else if (tab === 'Profile') {
+      navigation.navigate('Profile'); // Navigate to Profile screen
     }
   };
 
   return (
     <View style={styles.footer}>
-      <Pressable 
-        style={styles.footerOption} 
+      {/* Home Tab */}
+      <Pressable
+        style={styles.footerOption}
         onPress={() => handlePress('Home')}
       >
-        <Image 
+        <Image
           source={
-            selectedTab === 'Home' 
-            ? require('../../assets/HomeScreenImages/Home Icon Active.png') 
-            : require('../../assets/HomeScreenImages/Home Icon.png')
+            activeTab === 'Home'
+              ? require('../../assets/HomeScreenImages/Home Icon Active.png')
+              : require('../../assets/HomeScreenImages/Home Icon.png')
           }
           style={styles.footerIcon}
         />
-        <Text 
+        <Text
           style={[
-            styles.footerText, 
-            selectedTab === 'Home' && styles.activeText
+            styles.footerText,
+            activeTab === 'Home' && styles.activeText,
           ]}
         >
           Home
         </Text>
       </Pressable>
-      <Pressable 
-        style={styles.footerOption} 
+
+      {/* Post Tab */}
+      <Pressable
+        style={styles.footerOption}
         onPress={() => handlePress('Post')}
       >
-        <Image 
+        <Image
           source={require('../../assets/HomeScreenImages/Post Icon.png')} 
           style={styles.footerIcon}
         />
-        <Text style={styles.footerText}>Post</Text>
+        <Text
+          style={[
+            styles.footerText,
+            activeTab === 'Post' && styles.activeText,
+          ]}
+        >
+          Post
+        </Text>
       </Pressable>
-      <Pressable 
-        style={styles.footerOption} 
+
+      {/* Profile Tab */}
+      <Pressable
+        style={styles.footerOption}
         onPress={() => handlePress('Profile')}
       >
-        <Image 
+        <Image
           source={
-            selectedTab === 'Profile' 
-            ? require('../../assets/HomeScreenImages/Profile Icon Active.png') 
-            : require('../../assets/HomeScreenImages/Profile Icon.png')
+            activeTab === 'Profile'
+              ? require('../../assets/HomeScreenImages/Profile Icon Active.png')
+              : require('../../assets/HomeScreenImages/Profile Icon.png')
           }
           style={styles.footerIcon}
         />
-        <Text 
+        <Text
           style={[
-            styles.footerText, 
-            selectedTab === 'Profile' && styles.activeText
+            styles.footerText,
+            activeTab === 'Profile' && styles.activeText,
           ]}
         >
           Profile
@@ -103,7 +115,8 @@ const styles = StyleSheet.create({
     color: '#666363',
   },
   activeText: {
-    color: 'purple',  // Set active text color to purple
+    color: 'purple', // Active tab text color
+    fontWeight: 'bold',
   },
 });
 

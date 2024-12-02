@@ -12,29 +12,29 @@ import { getData } from '../utils/storage';
 import { removeData } from '../utils/storage';
 
 
-const HomeScreen = ({ navigation, onLoginStateChange }) => {
+const HomeScreen = () => {
   //outfits that will be rendered on the home screen
   const [outfits, setOutfits] = useState([]);
-  const handleLogout = async () => {
-    console.log('Logout triggered');
-    await removeData('user');
-    onLoginStateChange(); 
+  // const handleLogout = async () => {
+  //   console.log('Logout triggered');
+  //   await removeData('user');
+  //   onLoginStateChange(); 
  
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Login' }],
-      });
-    }, 150); 
-  };
+  //   setTimeout(() => {
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: 'Login' }],
+  //     });
+  //   }, 150); 
+  // };
  
 
-  useFocusEffect(
-    React.useCallback(() => {
-      console.log('HomeScreen gained focus');
-      onLoginStateChange(); 
-    }, [])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     console.log('HomeScreen gained focus');
+  //     onLoginStateChange(); 
+  //   }, [])
+  // );
 
   //for drop down styling, save space
   const dropdownProps = {
@@ -171,7 +171,7 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
   );
 
    // function for rendering outfit
-   const renderOutfitCards = () => {
+  const renderOutfitCards = () => {
     return outfits.map((outfits) => (
       <OutfitCard key={outfits.id} outfits={outfits} />
     ));
@@ -186,9 +186,9 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
         <View style ={styles.flexIcon}>
           {/* Logo */}
           <Text style={styles.logo}>CLOSET SHARE.</Text>
-          <Pressable onPress={handleLogout} style={styles.logoutButton}>
+          {/* <Pressable onPress={handleLogout} style={styles.logoutButton}>
             <Image style={styles.logoutButtonImage} source={require('../../assets/HomeScreenImages/LogoutIcon.png') } />
-          </Pressable>
+          </Pressable> */}
         </View>
         
 
@@ -269,7 +269,7 @@ const HomeScreen = ({ navigation, onLoginStateChange }) => {
       </View>
 
       {/* ------------------------------------------Footer------------------------------------------------------- */}
-      <Footer />
+      <Footer activeTab={"Home"} />
     </SafeAreaProvider>
   );
 };

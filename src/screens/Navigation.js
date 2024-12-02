@@ -39,7 +39,7 @@ const NavigationScreen = ({ route, navigation }) => {
 
   const progressiveRadiusSearch = async (coords) => {
     setLoading(true); // Start loading
-    let radius = 5000; // Initial radius, 5000 = 5km
+    let radius = 1000; // Initial radius, 1000 = 1km
     const maxRadius = 50000; 
     let nearestPlace = null;
 
