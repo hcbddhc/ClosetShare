@@ -445,7 +445,7 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
                 />
               </View>
               <Pressable style={styles.deletePiece} onPress={() => deletePiece(piece.id)}>
-                <Image source={require('../../assets/outfitCreationImages/delete button.png')} />
+                <Image style={styles.trashcan} source={require('../../assets/outfitCreationImages/trash can.png')} />
               </Pressable>
             </View>
           ))}
@@ -487,15 +487,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#9D4ECC',
     paddingHorizontal: 15,
     paddingVertical: 5,
-    alignContent: 'center',
-    justifycontent: 'center',
     borderRadius: 10,
+    justifyContent: 'center'
   },
   //the post button text
   postButtonText: {
     color: 'white',
     fontFamily: 'Poppins_600SemiBold',
-    fontSize: 18,
+    fontSize: 16,
   },
   // "create outfit" text
   h1: {
@@ -580,6 +579,10 @@ const styles = StyleSheet.create({
     width: '10%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  trashcan: {
+    width: 20,
+    height: 20,
   },
   pieceText: {
     color: '#666363',

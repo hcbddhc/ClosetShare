@@ -59,6 +59,17 @@ const HomeScreen = () => {
     { label: 'Year-round', value: 'year-round' },
   ];
 
+  const [filterHeight, setFilterHeight] = useState(null);
+  const heightSelection = [
+    { label: '155-159 cm', value: '155-159' },
+    { label: '160-164 cm', value: '160-164' },
+    { label: '165-169 cm', value: '165-169' },
+    { label: '170-174 cm', value: '170-174' },
+    { label: '175-179 cm', value: '175-179' },
+    { label: '180-184 cm', value: '180-184' },
+    { label: 'none', value: 'none' },
+  ];
+
   //variable for the search bar input
   const [searchText, setSearchText] = useState('');
 
@@ -80,11 +91,11 @@ const HomeScreen = () => {
               // Apply filters based on the selected criteria
               if (filterSeason) outfitsQuery = query(outfitsQuery, where("season", "==", filterSeason));
               if (filterCategory) outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
+              if (filterHeight) outfitsQuery = query(outfitsQuery, where("height", "==", filterHeight));
               if (filterBodyType) outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
   
               // Apply the search result if there is one
               if (searchText) {
-                console.log("searching");
                 outfitsQuery = query(outfitsQuery, 
                   where("name", ">=", searchText),
                   where("name", "<=", searchText + "\uf8ff")
@@ -160,7 +171,7 @@ const HomeScreen = () => {
         }
       };
       fetchData();
-    }, [navigationMode, filterSeason, filterCategory, filterBodyType, searchText])
+    }, [navigationMode, filterSeason, filterCategory, filterHeight, filterBodyType, searchText])
   );
 
    // function for rendering outfit
@@ -190,7 +201,7 @@ const HomeScreen = () => {
 
         {/* Filter bar */}
         <View style = {styles.filter}>
-          <Pressable style={styles.filterIcon}><Image source={require('../../assets/HomeScreenImages/Filter Icon.png')}/></Pressable>
+          <Pressable><Image style={styles.filterIcon} source={require('../../assets/HomeScreenImages/Filter Icon.png')}/></Pressable>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptionsContainer}>
             <Dropdown
                 {...dropdownProps}
@@ -206,9 +217,13 @@ const HomeScreen = () => {
                 onChange={item => setFilterBodyType(item.value)}
                 placeholder="Body Type"
             />
-            <Pressable style={styles.filterOption}>
-              <Text style={styles.filterText}>Height</Text>
-            </Pressable>
+            <Dropdown
+                {...dropdownProps}
+                data={heightSelection}
+                value={filterHeight}
+                onChange={item => setFilterHeight(item.value)}
+                placeholder="Height"
+            />
             <Dropdown
                 {...dropdownProps}
                 data={seasonSelection}
@@ -300,6 +315,8 @@ const styles = StyleSheet.create({
     height: 40,
   },
   searchIcon: {
+    width: 20,
+    height: 20,
     marginRight: 10,
   },
 
@@ -311,6 +328,8 @@ const styles = StyleSheet.create({
     marginLeft: 22,
   },
   filterIcon: {
+    width: 25,
+    height: 25,
     marginRight: 10,
   },
   filterText: {
