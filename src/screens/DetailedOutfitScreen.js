@@ -9,7 +9,7 @@ import { collection, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 const DetailedOutfitScreen = ({ route }) => {
-    const { outfitId, userId, userName} = route.params; // Destructure the outfitId and userId from route params
+    const { outfitId, userId, userName} = route.params; 
     const [outfit, setOutfit] = useState(null);
     
     //navigation stuff
@@ -24,12 +24,10 @@ const DetailedOutfitScreen = ({ route }) => {
             try {
               //the query: find the exact outfit in the firestore database using the passed user id and outfit id
               const outfitRef = doc(db, 'users', userId, 'outfits', outfitId);
-          
-              // Fetch the outfit document
               const outfitDoc = await getDoc(outfitRef);
           
               if (outfitDoc.exists()) {
-                console.log("Outfit found:", outfitDoc.data()); // Log the outfit data
+                console.log("Outfit found:", outfitDoc.data()); 
                 setOutfit(outfitDoc.data());
               } else {
                 console.log("Outfit not found!");
@@ -55,32 +53,32 @@ const DetailedOutfitScreen = ({ route }) => {
     //function that handles deletion
     const deleteOutfit = async () => {
       try {
-          const outfitRef = doc(db, 'users', userId, 'outfits', outfitId);
-          await deleteDoc(outfitRef);
-
-          //delete outfit images from imgur
-          if (outfit.images && Array.isArray(outfit.images)) {
-            for (const image of outfit.images) {
-                if (image.deletehash) {
-                    await deleteImageFromImgur(image.deletehash); // Delete the image from Imgur
-                }
+        const outfitRef = doc(db, 'users', userId, 'outfits', outfitId);
+        await deleteDoc(outfitRef);
+    
+        // Delete outfit images from Imgur
+        if (outfit.images && Array.isArray(outfit.images)) {
+          for (const image of outfit.images) {
+            if (image?.deletehash) {
+              await deleteImageFromImgur(image.deletehash); 
             }
           }
-
-        //delete piece images from imgur
+        }
+    
+        // Delete piece images from Imgur
         if (outfit.pieces && Array.isArray(outfit.pieces)) {
           for (const piece of outfit.pieces) {
-              if (piece.image && piece.image.deletehash) {
-                  await deleteImageFromImgur(piece.image.deletehash); // Delete piece image from Imgur
-              }
+            if (piece?.image?.deletehash) { 
+              await deleteImageFromImgur(piece.image.deletehash); 
+            }
           }
-         }
-          
-          Alert.alert("Success", "Outfit deleted successfully!");
-          navigation.goBack(); // Navigate back after deletion
+        }
+    
+        Alert.alert("Success", "Outfit deleted successfully!");
+        navigation.goBack(); 
       } catch (error) {
-          console.error("Error deleting outfit:", error);
-          Alert.alert("Error", "Failed to delete the outfit. Please try again.");
+        console.error("Error deleting outfit:", error);
+        Alert.alert("Error", "Failed to delete the outfit. Please try again.");
       }
   };
 
@@ -99,7 +97,7 @@ const DetailedOutfitScreen = ({ route }) => {
               <Pressable onPress={deleteOutfit} style={styles.backButton}>
                 <Image
                 source={require('../../assets/OutfitDetailScreenImages/trash can.png')}
-                style={styles.backButtonImage}
+                style={styles.trashcan}
                 />
               </Pressable>
             </View>
@@ -158,41 +156,37 @@ const DetailedOutfitScreen = ({ route }) => {
                   <Text style={styles.captionText}>Outfit Pieces</Text>
                   {outfit.pieces.map((piece, index) => (
                     <Pressable
-                      key={piece.id || index}
-                      style={styles.outfitPiece}
-                      onPress={() => {
-                        if (piece.location === "Unknown Location" || !piece.location) {
-                          Alert.alert("Invalid Location", "This outfit piece does not have a valid location.");
-                        } else {
-                          saveOutfitID(outfitId); // Save outfitId temporarily
-                          navigation.navigate('Navigation', { pieceLocation: piece.location, userId, outfitId });
-                        }
-                      }}                  
-                      
-                    >
-                      <View style={styles.pieceLeft}>
-                        {piece.image?.imageUrl ? (
-                          <Image 
-                            style={styles.pieceImage} 
-                            source={{ uri: piece.image.imageUrl }} 
-                          />
-                        ) : (
-                          <Image 
-                            style={styles.pieceImage} 
-                            source={require('../../assets/outfitCreationImages/Add Outfit.png')} 
-                          />
-                        )}
-                      </View>
-                      <View style={styles.pieceRight}>
-                        <View>
-                          <Text style={styles.pieceTitle}>{piece.title || "Untitled Piece"}</Text>
-                          <Text style={styles.pieceLocation}>From: {piece.location || "Unknown Location"}</Text>
-                        </View>
+                    key={piece?.id || `piece-${index}`} 
+                    style={styles.outfitPiece}
+                    onPress={() => {
+                      if (!piece || !piece.location || piece.location === "Unknown Location") {
+                        Alert.alert("Invalid Location", "This outfit piece does not have a valid location.");
+                      } else {
+                        saveOutfitID(outfitId); 
+                        navigation.navigate('Navigation', { pieceLocation: piece.location, userId, outfitId });
+                      }
+                    }}
+                  >
+                    <View style={styles.pieceLeft}>
+                      {piece?.image?.imageUrl ? (
                         <Image
-                          source={require('../../assets/OutfitDetailScreenImages/map icon.png')} 
-                          style={styles.mapIcon}
+                          style={styles.pieceImage}
+                          source={{ uri: piece.image.imageUrl }}
                         />
+                      ) : (
+                        <Text style={styles.noImageText}>No image provided</Text>
+                      )}
+                    </View>
+                    <View style={styles.pieceRight}>
+                      <View>
+                        <Text style={styles.pieceTitle}>{piece?.title || "Untitled Piece"}</Text>
+                        <Text style={styles.pieceLocation}>From: {piece?.location || "Unknown Location"}</Text>
                       </View>
+                      <Image
+                        source={require('../../assets/OutfitDetailScreenImages/map icon.png')}
+                        style={styles.mapIcon}
+                      />
+                    </View>
                     </Pressable>
                   ))}
                 </View>
@@ -228,6 +222,10 @@ const styles = StyleSheet.create({
       backButtonImage: {
         width: 30,
         height: 30,
+      },
+      trashcan: {
+        width: 25,
+        height: 25,
       },
 
       //--------------------------add image section (where user add outfit image)-----------------------------
@@ -324,6 +322,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '62%',
     paddingRight: 20,
+    paddingVertical: 10,
   },
   pieceTitle: {
     color: '#9D4EDD',
@@ -339,6 +338,12 @@ const styles = StyleSheet.create({
   mapIcon: {
     width: 25,
     height: 25,
+  },
+  noImageText: {
+    fontSize: 12,
+    color: '#9D4EDD',
+    fontFamily: 'Nunito_400Regular',
+    paddingLeft: 10,
   }
 });
 

@@ -210,11 +210,11 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
         outfitImages.map(async (image) => {
           // Check if the image is null or has no URI
           if (!image || !image.uri) {
-            return null; // Skip processing if image is null or invalid
+            return null; 
           }
           try {
             const result = await uploadImageToImgur(image);
-            return result; // result will be null if upload fails or the image is invalid
+            return result;
           } catch (error) {
             console.error("Error uploading image to Imgur:", error);
             return null;
@@ -228,18 +228,18 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
       const processedOutfitPieces = await Promise.all(
         outfitPieces.map(async (piece) => {
           if (!piece.image || !piece.image.uri) {
-            return null; // Skip processing if image is null or invalid
+            return null; 
           }
           try {
             const imageResult = await uploadImageToImgur(piece.image);
             if (imageResult) {
               return {
-                title: piece.title, // Retain the title
-                location: piece.location, // Retain the location
-                image: imageResult, // Add the image data
+                title: piece.title,
+                location: piece.location, 
+                image: imageResult, 
               };
             } else {
-              return null; // Return null if upload fails
+              return null;
             }
           } catch (error) {
             console.error("Error uploading piece image to Imgur:", error);

@@ -44,18 +44,20 @@ const SetLocationScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-        {region && (
-            <MapView
-                provider={MapView.PROVIDER_GOOGLE} // Force Google Maps on iOS
-                style={styles.map}
-                initialRegion={region}
-                onPress={(e) => setLocation(e.nativeEvent.coordinate)}
-            >
-                {location && <Marker coordinate={location} draggable />}
-
-            </MapView>
-        )}
-        <DefaultButton title="Confirm" onPress={handleConfirm} style={styles.yesButton} />
+      {region && (
+        <MapView
+          provider={MapView.PROVIDER_GOOGLE} // Force Google Maps on iOS
+          style={styles.map}
+          initialRegion={region}
+          onPress={(e) => setLocation(e.nativeEvent.coordinate)}
+        >
+          {location && <Marker coordinate={location} draggable />}
+        </MapView>
+      )}
+      
+      <View style={styles.buttonContainer} pointerEvents="box-none">
+        <DefaultButton title="Confirm" onPress={handleConfirm} />
+      </View>
     </View>
   );
 };

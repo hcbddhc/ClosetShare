@@ -103,7 +103,7 @@ const HomeScreen = () => {
               }
               
               //Now do the query
-              const outfitsList = await getDocs(outfitsQuery); // Fetch outfits based on query
+              const outfitsList = await getDocs(outfitsQuery);
   
               // Process each outfit document
               outfitsList.forEach((outfitDoc) => {
@@ -111,7 +111,7 @@ const HomeScreen = () => {
                   id: outfitDoc.id,
                   userID: userDoc.id,
                   outfitName: outfitDoc.data().name,
-                  username: userDoc.data().username || "Anonymous", // Fallback
+                  username: userDoc.data().username || "Anonymous", 
                   creationDate: outfitDoc.data().creationDate || "Unknown",
                   image: outfitDoc.data().images?.[0]?.imageUrl,
                 });
@@ -125,7 +125,7 @@ const HomeScreen = () => {
   
             if (!uid) {
               console.log("User is not logged in");
-              setOutfits([]); // If no user is logged in, return empty
+              setOutfits([]); 
               return;
             }
   
@@ -153,7 +153,7 @@ const HomeScreen = () => {
                       id: outfitDoc.id,
                       userID: userDoc.id,
                       outfitName: outfitDoc.data().name,
-                      username: userDoc.data().username || "Anonymous", // Fallback
+                      username: userDoc.data().username || "Anonymous", 
                       creationDate: outfitDoc.data().creationDate || "Unknown",
                       image: outfitDoc.data().images?.[0]?.imageUrl,
                     });
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
   outfitContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap', // Allow wrapping
-    justifyContent: 'space-between', // Space out items
+    justifyContent: 'space-between',
     paddingTop: 10,
     marginHorizontal: 22,
   },

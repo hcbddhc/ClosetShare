@@ -435,7 +435,6 @@ const styles = StyleSheet.create({
         color: '#9D4EDD',
     },
     outfitContainer: {
-        flexGrow: 1,
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
