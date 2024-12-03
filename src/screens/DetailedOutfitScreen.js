@@ -208,11 +208,11 @@ const styles = StyleSheet.create({
   imageFrame: { //for the pressable that contains the images
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: 10,
   },
   outfitImage: { // For actual image
-    width: 339,
-    height: 281,
+    width: 380,
+    height: 290,
     resizeMode: 'contain',
   },
   //-----------------------------content section-----------------------------
