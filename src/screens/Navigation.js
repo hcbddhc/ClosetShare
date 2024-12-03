@@ -3,6 +3,8 @@ import { View, StyleSheet, Alert, Text, Linking, Pressable, Image, ActivityIndic
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { getOutfitID } from '../utils/storage';
+import DefaultButton from '../components/DefaultButton'; 
+import {SafeAreaProvider, withSafeAreaInsets} from 'react-native-safe-area-context';
 
 const NavigationScreen = ({ route, navigation }) => {
   const { pieceLocation } = route.params;
@@ -46,7 +48,7 @@ const NavigationScreen = ({ route, navigation }) => {
     while (radius <= maxRadius && !nearestPlace) {
       console.log(`Searching with radius: ${radius}`);
       nearestPlace = await fetchNearbyPlace(coords, radius);
-      if (!nearestPlace) radius += 5000; // Increase the radius if no place found
+      if (!nearestPlace) radius += 1000; // Increase the radius if no place found
     }
 
     setLoading(false); // Stop loading
@@ -182,31 +184,40 @@ const NavigationScreen = ({ route, navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={handleBackPress} style={styles.backButton}>
-        <Image
-          source={require('../../assets/outfitCreationImages/back button.png')}
-          style={styles.backButtonImage}
-        />
-      </Pressable>
-      <MapView
-        key={renderKey}
-        provider={MapView.PROVIDER_GOOGLE}
-        style={styles.map}
-        region={region}
-      >
-        <Marker coordinate={currentLocation} title="Your Location" />
-        <Marker
-          coordinate={destination}
-          title={pieceLocation}
-          description="Tap to navigate in Google Maps"
-          onPress={openGoogleMaps}
-        />
-        {routeCoordinates.length > 0 && (
-          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="blue" />
-        )}
-      </MapView>
-    </View>
+    <SafeAreaProvider style={styles.bigContainer}>
+      <View style={styles.container}>
+        <Pressable onPress={handleBackPress} style={styles.backButton}>
+          <Image
+            source={require('../../assets/outfitCreationImages/back button.png')}
+            style={styles.backButtonImage}
+          />
+        </Pressable>
+        <MapView
+          key={renderKey}
+          provider={MapView.PROVIDER_GOOGLE}
+          style={styles.map}
+          region={region}
+        >
+          <Marker coordinate={currentLocation} title="Your Location" />
+          <Marker
+            coordinate={destination}
+            title={pieceLocation}
+            description="Tap to navigate in Google Maps"
+            onPress={openGoogleMaps}
+          />
+          {routeCoordinates.length > 0 && (
+            <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="blue" />
+          )}
+        </MapView>
+        <View style={styles.buttonContainer}>
+          <DefaultButton
+            title="Navigate"
+            onPress={openGoogleMaps}
+            style={styles.navigateButton}
+          />
+        </View>
+      </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -232,6 +243,20 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
   },
+  buttonContainer: {
+    position: 'absolute',
+    bottom: 30,
+    width: '100%',
+    alignItems: 'center',
+  },
+  navigateButton: {
+    width: '80%',
+  },
+  bigContainer: {
+    flex: 1,   
+    backgroundColor: '#fff', 
+    paddingTop: 20,
+},
 });
 
 export default NavigationScreen;

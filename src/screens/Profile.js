@@ -8,6 +8,7 @@ import { collection, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore'
 import { db } from '../firebaseConfig';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
+import {SafeAreaProvider, withSafeAreaInsets} from 'react-native-safe-area-context';
 
 const ProfileScreen = ({ navigation, onLoginStateChange }) => {
     const [outfits, setOutfits] = useState([]);
@@ -140,193 +141,195 @@ const ProfileScreen = ({ navigation, onLoginStateChange }) => {
     );
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+    <SafeAreaProvider style={styles.bigContainer}>
+        <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+            <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Image
+                source={require('../../assets/outfitCreationImages/back button.png')}
+                style={styles.backButtonImage}
+                />
+            </Pressable>
+            <View style={styles.profileInfo}>
             <Image
-            source={require('../../assets/outfitCreationImages/back button.png')}
-            style={styles.backButtonImage}
+                source={require('../../assets/ProfileScreenImages/maleProfile.png')} //Profile Image
+                style={styles.profileImage}
             />
-        </Pressable>
-        <View style={styles.profileInfo}>
-          <Image
-            source={require('../../assets/ProfileScreenImages/maleProfile.png')} //Profile Image
-            style={styles.profileImage}
-          />
-          <Text style={styles.profileName}>{username}</Text>
-        </View>
-        {/* Navigation Tabs */}
-        <View style={styles.contentSelectionContainer}>
-          <Pressable
-            style={[
-              styles.contentOption,
-              navigationMode === 1 && styles.selectedOption,
-            ]}
-            onPress={() => setNavigationMode(1)}
-          >
-            <Text
-              style={[
-                styles.contentOptionText,
-                navigationMode === 1 && styles.selectedOptionText,
-              ]}
+            <Text style={styles.profileName}>{username}</Text>
+            </View>
+            {/* Navigation Tabs */}
+            <View style={styles.contentSelectionContainer}>
+            <Pressable
+                style={[
+                styles.contentOption,
+                navigationMode === 1 && styles.selectedOption,
+                ]}
+                onPress={() => setNavigationMode(1)}
             >
-              My Posts
-            </Text>
-          </Pressable>
+                <Text
+                style={[
+                    styles.contentOptionText,
+                    navigationMode === 1 && styles.selectedOptionText,
+                ]}
+                >
+                My Posts
+                </Text>
+            </Pressable>
 
-          <Pressable
-            style={[
-              styles.contentOption,
-              navigationMode === 2 && styles.selectedOption,
-            ]}
-            onPress={() => setNavigationMode(2)}
-          >
-            <Text
-              style={[
-                styles.contentOptionText,
-                navigationMode === 2 && styles.selectedOptionText,
-              ]}
+            <Pressable
+                style={[
+                styles.contentOption,
+                navigationMode === 2 && styles.selectedOption,
+                ]}
+                onPress={() => setNavigationMode(2)}
             >
-              Profile
-            </Text>
-          </Pressable>
+                <Text
+                style={[
+                    styles.contentOptionText,
+                    navigationMode === 2 && styles.selectedOptionText,
+                ]}
+                >
+                Profile
+                </Text>
+            </Pressable>
+            </View>
         </View>
-      </View>
 
-      {/* Content */}
-      {navigationMode === 1 ? (
-        <ScrollView contentContainerStyle={styles.outfitContainer}>
-          {outfits.length > 0
-            ? outfits.map((outfit) => (
-                <OutfitCard
-                  key={outfit.id}
-                  outfits={outfit}
-                  navigation={navigation}
-                />
-              ))
-            : <Text style={styles.emptyText}>No posts yet.</Text>}
-        </ScrollView>
-      ) : (
-        <View style={styles.profileContent}>
-            {!editingState ? (
-            <>
-                <View style={styles.readOnlyField}>
-                    <Text style={styles.readOnlyLabel}>Username:</Text>
-                    <Text style={styles.readOnlyValue}>{editingProfile.username || 'N/A'}</Text>
-                </View>
-                <View style={styles.readOnlyField}>
-                    <Text style={styles.readOnlyLabel}>Weight:</Text>
-                    <Text style={styles.readOnlyValue}>{editingProfile.weight || 'N/A'}</Text>
-                </View>
-                <View style={styles.readOnlyField}>
-                    <Text style={styles.readOnlyLabel}>Height:</Text>
-                    <Text style={styles.readOnlyValue}>{editingProfile.height || 'N/A'}</Text>
-                </View>
-                <View style={styles.readOnlyField}>
-                    <Text style={styles.readOnlyLabel}>Gender:</Text>
-                    <Text style={styles.readOnlyValue}>{editingProfile.gender || 'N/A'}</Text>
-                </View>
-            </>
-            ) : (
-            <>
-                <View style={styles.inputRow}>
-                <Text style={styles.labelText}>Username:</Text>
-                <TextInput
-                    style={styles.textInput}
-                    value={editingProfile.username}
-                    onChangeText={(text) =>
-                    setEditingProfile((prev) => ({ ...prev, username: text }))
-                    }
-                />
-                </View>
-
-                <View style={styles.inputRow}>
-                    <Text style={styles.labelText}>Weight:</Text>
-                    <Dropdown
-                        style={styles.dropdown}
-                        data={weightOptions}
-                        labelField="label"
-                        valueField="value"
-                        value={editingProfile.weight}
-                        placeholder="Select Weight"
-                        onChange={(item) =>
-                        setEditingProfile((prev) => ({ ...prev, weight: item.value }))
+        {/* Content */}
+        {navigationMode === 1 ? (
+            <ScrollView contentContainerStyle={styles.outfitContainer}>
+            {outfits.length > 0
+                ? outfits.map((outfit) => (
+                    <OutfitCard
+                    key={outfit.id}
+                    outfits={outfit}
+                    navigation={navigation}
+                    />
+                ))
+                : <Text style={styles.emptyText}>No posts yet.</Text>}
+            </ScrollView>
+        ) : (
+            <View style={styles.profileContent}>
+                {!editingState ? (
+                <>
+                    <View style={styles.readOnlyField}>
+                        <Text style={styles.readOnlyLabel}>Username:</Text>
+                        <Text style={styles.readOnlyValue}>{editingProfile.username || 'N/A'}</Text>
+                    </View>
+                    <View style={styles.readOnlyField}>
+                        <Text style={styles.readOnlyLabel}>Weight:</Text>
+                        <Text style={styles.readOnlyValue}>{editingProfile.weight || 'N/A'}</Text>
+                    </View>
+                    <View style={styles.readOnlyField}>
+                        <Text style={styles.readOnlyLabel}>Height:</Text>
+                        <Text style={styles.readOnlyValue}>{editingProfile.height || 'N/A'}</Text>
+                    </View>
+                    <View style={styles.readOnlyField}>
+                        <Text style={styles.readOnlyLabel}>Gender:</Text>
+                        <Text style={styles.readOnlyValue}>{editingProfile.gender || 'N/A'}</Text>
+                    </View>
+                </>
+                ) : (
+                <>
+                    <View style={styles.inputRow}>
+                    <Text style={styles.labelText}>Username:</Text>
+                    <TextInput
+                        style={styles.textInput}
+                        value={editingProfile.username}
+                        onChangeText={(text) =>
+                        setEditingProfile((prev) => ({ ...prev, username: text }))
                         }
                     />
                     </View>
 
                     <View style={styles.inputRow}>
-                        <Text style={styles.labelText}>Height:</Text>
+                        <Text style={styles.labelText}>Weight:</Text>
                         <Dropdown
                             style={styles.dropdown}
-                            data={heightOptions}
+                            data={weightOptions}
                             labelField="label"
                             valueField="value"
-                            value={editingProfile.height}
-                            placeholder="Select Height"
+                            value={editingProfile.weight}
+                            placeholder="Select Weight"
                             onChange={(item) =>
-                            setEditingProfile((prev) => ({ ...prev, height: item.value }))
+                            setEditingProfile((prev) => ({ ...prev, weight: item.value }))
                             }
                         />
-                    </View>
+                        </View>
 
-                    <View style={styles.inputRow}>
-                        <Text style={styles.labelText}>Gender:</Text>
-                        <Dropdown
-                            style={styles.dropdown}
-                            data={genderOptions}
-                            labelField="label"
-                            valueField="value"
-                            value={editingProfile.gender}
-                            placeholder="Select Gender"
-                            onChange={(item) =>
-                            setEditingProfile((prev) => ({ ...prev, gender: item.value }))
-                            }
-                        />
-                    </View>
-            </>
-            )}
+                        <View style={styles.inputRow}>
+                            <Text style={styles.labelText}>Height:</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={heightOptions}
+                                labelField="label"
+                                valueField="value"
+                                value={editingProfile.height}
+                                placeholder="Select Height"
+                                onChange={(item) =>
+                                setEditingProfile((prev) => ({ ...prev, height: item.value }))
+                                }
+                            />
+                        </View>
+
+                        <View style={styles.inputRow}>
+                            <Text style={styles.labelText}>Gender:</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={genderOptions}
+                                labelField="label"
+                                valueField="value"
+                                value={editingProfile.gender}
+                                placeholder="Select Gender"
+                                onChange={(item) =>
+                                setEditingProfile((prev) => ({ ...prev, gender: item.value }))
+                                }
+                            />
+                        </View>
+                </>
+                )}
 
 
-            {!editingState ? (
-                <DefaultButton
-                    title="Edit Profile"
-                    onPress={() => setEditingState(true)} // Switch to editing mode
-                    style={styles.editingButton}
-                />
-            ) : (
-            <View style={styles.buttonContainer}>
-                <DefaultButton
-                    title="Save"
-                    onPress={() => {
-                        handleSaveProfile();
-                        setEditingState(false); // Exit editing mode after saving
-                    }}
-                    style={styles.saveButton}
-                />
-                <DefaultButton
-                    title="Cancel"
-                    onPress={() => {
-                        setEditingState(false); // Exit editing mode without saving
-                    }}
-                    style={styles.cancelButton}
-                />
+                {!editingState ? (
+                    <DefaultButton
+                        title="Edit Profile"
+                        onPress={() => setEditingState(true)} // Switch to editing mode
+                        style={styles.editingButton}
+                    />
+                ) : (
+                <View style={styles.buttonContainer}>
+                    <DefaultButton
+                        title="Save"
+                        onPress={() => {
+                            handleSaveProfile();
+                            setEditingState(false); // Exit editing mode after saving
+                        }}
+                        style={styles.saveButton}
+                    />
+                    <DefaultButton
+                        title="Cancel"
+                        onPress={() => {
+                            setEditingState(false); // Exit editing mode without saving
+                        }}
+                        style={styles.cancelButton}
+                    />
+                </View>
+                )}
+                <View style={styles.logoutContainer}>
+                    <DefaultButton
+                    title="Logout"
+                    onPress={handleLogout}
+                    style={styles.logoutButton}
+                    />
+                </View>
             </View>
-            )}
-            <View style={styles.logoutContainer}>
-                <DefaultButton
-                title="Logout"
-                onPress={handleLogout}
-                style={styles.logoutButton}
-                />
-            </View>
+        )}
+
+        {/* Footer */}
+        <Footer activeTab="Profile" />
         </View>
-      )}
-
-      {/* Footer */}
-      <Footer activeTab="Profile" />
-    </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -499,6 +502,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         height: 40,
+    },
+    bigContainer: {
+        flex: 1,            // Take up the full screen
+        backgroundColor: '#fff',  // Set background color
+        paddingTop: 40,
     },
       
 });
