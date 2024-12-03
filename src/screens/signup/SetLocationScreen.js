@@ -52,6 +52,7 @@ const SetLocationScreen = ({ navigation, route }) => {
                 onPress={(e) => setLocation(e.nativeEvent.coordinate)}
             >
                 {location && <Marker coordinate={location} draggable />}
+
             </MapView>
         )}
         <DefaultButton title="Confirm" onPress={handleConfirm} style={styles.yesButton} />
@@ -67,7 +68,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   yesButton: {
-    marginTop: 25, 
+    position: 'absolute',  
+    bottom: 30,            
     width: 250,
     alignSelf: 'center', 
   },

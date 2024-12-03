@@ -36,7 +36,10 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 0.7,
+        width: '100%', 
+        height: '100%',
         justifyContent:'center',
+        aspectRatio: 1,
     },
     title: {
         fontFamily: 'Poppins_700Bold',

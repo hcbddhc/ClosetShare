@@ -185,7 +185,7 @@ const HomeScreen = () => {
         {/* Logo */}
         <View style ={styles.flexIcon}>
           {/* Logo */}
-          <Text style={styles.logo}>CLOSET SHARE.</Text>
+          <Text style={styles.logo}>CLOSETSHARE.</Text>
           {/* <Pressable onPress={handleLogout} style={styles.logoutButton}>
             <Image style={styles.logoutButtonImage} source={require('../../assets/HomeScreenImages/LogoutIcon.png') } />
           </Pressable> */}
