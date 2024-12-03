@@ -69,13 +69,13 @@ const LoginScreen = ({ navigation, onLoginStateChange  }) => {
         <DefaultButton title="Sign up" onPress={() => navigation.navigate('GetStarted')} />
       </View>
 
-      <Text style={styles.orText}>Or login with</Text>
+      {/* <Text style={styles.orText}>Or login with</Text>
       
       <View style={styles.socialIconsContainer}>
         <TouchableOpacity style={styles.socialIcon}><Text>F</Text></TouchableOpacity>
         <TouchableOpacity style={styles.socialIcon}><Text>G</Text></TouchableOpacity>
         <TouchableOpacity style={styles.socialIcon}><Text>A</Text></TouchableOpacity>
-      </View>
+      </View> */}
 
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
         <Text style={styles.skipText}>Skip for now</Text>

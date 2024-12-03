@@ -602,6 +602,15 @@ const styles = StyleSheet.create({
     width: '100%',
     resizeMode: 'contain',
   },
+  backButton: {
+    left: -10,
+    top: -2,
+    zIndex: 10,
+  },
+  backButtonImage: {
+      width: 30,
+      height: 30,
+  },
 });
 
 export default OutfitCreationScreen;
