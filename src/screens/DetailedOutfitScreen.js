@@ -59,8 +59,11 @@ const DetailedOutfitScreen = ({ route }) => {
             {/* ----------------------------header------------------------------*/}
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
-                <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Image style={styles.backButton} source={require('../../assets/outfitCreationImages/back button.png')} />
+                  <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Image
+                    source={require('../../assets/outfitCreationImages/back button.png')}
+                    style={styles.backButtonImage}
+                    />
                 </Pressable>
                 </View>
             </View>
@@ -182,8 +185,12 @@ const styles = StyleSheet.create({
         fontSize: 24,
       },
       backButton: {
-        width: 25,
-        height: 25,
+        left: -10,
+        zIndex: 10,
+      },
+      backButtonImage: {
+        width: 30,
+        height: 30,
       },
 
       //--------------------------add image section (where user add outfit image)-----------------------------
