@@ -235,20 +235,23 @@ const styles = StyleSheet.create({
   imageView: { //View that contains the whole image section
     flexDirection: 'row',
     alignContent: 'center',
+    height: 330,
+    marginBottom: 10,
   },
   imageScrollContainer: { //for the scrollView that contains all the images
+    height: '100%',
     flexDireciton: 'row',
-    alignContent: 'center',
+    marginLeft: 10,
+    marginRight: 10,
   },
   imageFrame: { //for the pressable that contains the images
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
   },
   outfitImage: { // For actual image
-    width: 380,
-    height: 290,
-    resizeMode: 'contain',
+    height: '100%',
+    width: 360,
   },
   //-----------------------------content section-----------------------------
   content: {

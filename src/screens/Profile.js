@@ -294,11 +294,13 @@ const ProfileScreen = ({ navigation, onLoginStateChange }) => {
 
 
                 {!editingState ? (
+                <View style={styles.buttonContainer}>
                     <DefaultButton
                         title="Edit Profile"
                         onPress={() => setEditingState(true)} // Switch to editing mode
                         style={styles.editingButton}
                     />
+                </View>
                 ) : (
                 <View style={styles.buttonContainer}>
                     <DefaultButton
@@ -359,20 +361,21 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
         width: '80%',
+        flexDirection: 'row',
+        paddingVertical: 12, 
+        alignItems: 'center',
+        alignSelf: 'center',
+        justifyContent: 'center', // Ensures content inside the button is centered
     },
     editingButton: {
-        width: '100%', 
-        paddingHorizontal: 125,
+        paddingVertical: 12, 
     },
     logoutButton: {
         width: '100%', 
         backgroundColor: '#e0163f', 
         alignSelf: 'center', 
         paddingVertical: 12, 
-        paddingHorizontal: 140,
         borderRadius: 8, 
         alignItems: 'center', 
     },
