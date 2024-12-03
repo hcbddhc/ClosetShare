@@ -62,7 +62,6 @@ const DetailedOutfitScreen = ({ route }) => {
                 <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Image source={require('../../assets/outfitCreationImages/back button.png')} />
                 </Pressable>
-                <Text style={styles.h1}>{outfit.name}</Text>
                 </View>
             </View>
 
@@ -80,7 +79,12 @@ const DetailedOutfitScreen = ({ route }) => {
 
               {/* ----------------------------content------------------------------*/}
               <View style={styles.content}>
-                <View style={styles.outputRow}>
+                <Text style={styles.h1}>{outfit.name}</Text>
+                <View style={styles.usernameRow}>
+                  <Image
+                    source={require('../../assets/HomeScreenImages/Profile Icon.png')} 
+                    style={styles.profileIcon}
+                  />
                   <Text style={styles.outputText}>{userName}</Text>
                 </View>
                 {/* --------Description Field----------*/}
@@ -176,6 +180,7 @@ const styles = StyleSheet.create({
       h1: {
         fontSize: 24,
         color: '#666363',
+        marginBottom: 5,
       },
 
       //--------------------------add image section (where user add outfit image)-----------------------------
@@ -192,11 +197,9 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   imageFrame: { //for the pressable that contains the images
-    width: 339,
-    height: 281,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
+    marginHorizontal: 20,
   },
   outfitImage: { // For actual image
     width: 339,
@@ -216,6 +219,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: '10%', 
   },
+  usernameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   captionText: {
     fontSize: 12,
     color: '#9D4EDD',
@@ -224,6 +232,11 @@ const styles = StyleSheet.create({
   outputText: {
     paddingBottom: 5,
     fontSize: 14,
+  },
+  profileIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 5,
   },
    //-----------------------------outfit pieces-----------------------------
   outfitPiece: {
