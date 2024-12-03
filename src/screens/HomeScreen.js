@@ -9,7 +9,6 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { getData } from '../utils/storage'; 
-import { removeData } from '../utils/storage';
 
 
 const HomeScreen = () => {
