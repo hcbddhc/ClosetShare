@@ -15,26 +15,6 @@ import { removeData } from '../utils/storage';
 const HomeScreen = () => {
   //outfits that will be rendered on the home screen
   const [outfits, setOutfits] = useState([]);
-  // const handleLogout = async () => {
-  //   console.log('Logout triggered');
-  //   await removeData('user');
-  //   onLoginStateChange(); 
- 
-  //   setTimeout(() => {
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: 'Login' }],
-  //     });
-  //   }, 150); 
-  // };
- 
-
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     console.log('HomeScreen gained focus');
-  //     onLoginStateChange(); 
-  //   }, [])
-  // );
 
   //for drop down styling, save space
   const dropdownProps = {
@@ -49,7 +29,7 @@ const HomeScreen = () => {
   //variable for method of navigation (explore, favorites, and nearby)
   //1: explore
   //2: favorites
-  //3: nearby
+  //3: nearby <-- can't finish, delete
   const [navigationMode, setNavigationMode] = useState(1);
   
   //variable for filter options, and choices for the drop down menu selections
@@ -79,6 +59,9 @@ const HomeScreen = () => {
     { label: 'Year-round', value: 'year-round' },
   ];
 
+  //variable for the search bar input
+  const [searchText, setSearchText] = useState('');
+
   //refresh list of outfits on load
   useFocusEffect(
     useCallback(() => {
@@ -99,6 +82,16 @@ const HomeScreen = () => {
               if (filterCategory) outfitsQuery = query(outfitsQuery, where("category", "==", filterCategory));
               if (filterBodyType) outfitsQuery = query(outfitsQuery, where("bodyType", "==", filterBodyType));
   
+              // Apply the search result if there is one
+              if (searchText) {
+                console.log("searching");
+                outfitsQuery = query(outfitsQuery, 
+                  where("name", ">=", searchText),
+                  where("name", "<=", searchText + "\uf8ff")
+                );
+              }
+              
+              //Now do the query
               const outfitsList = await getDocs(outfitsQuery); // Fetch outfits based on query
   
               // Process each outfit document
@@ -167,7 +160,7 @@ const HomeScreen = () => {
         }
       };
       fetchData();
-    }, [navigationMode, filterSeason, filterCategory, filterBodyType])
+    }, [navigationMode, filterSeason, filterCategory, filterBodyType, searchText])
   );
 
    // function for rendering outfit
@@ -186,16 +179,13 @@ const HomeScreen = () => {
         <View style ={styles.flexIcon}>
           {/* Logo */}
           <Text style={styles.logo}>CLOSETSHARE.</Text>
-          {/* <Pressable onPress={handleLogout} style={styles.logoutButton}>
-            <Image style={styles.logoutButtonImage} source={require('../../assets/HomeScreenImages/LogoutIcon.png') } />
-          </Pressable> */}
         </View>
         
 
         {/* Search Bar */}
         <View style = {styles.search}>
           <Image style={styles.searchIcon} source={require('../../assets/HomeScreenImages/Search Icon.png')} />
-          <TextInput style={styles.caption} placeholder="search......"/>
+          <TextInput style={styles.caption} placeholder="search......" onChangeText={(text) => setSearchText(text)}/>
         </View>
 
         {/* Filter bar */}
@@ -246,15 +236,6 @@ const HomeScreen = () => {
           >
             <Text style={[styles.contentOptionText, navigationMode === 2 && styles.selectedOptionText]}>Favorites</Text>
           </Pressable>
-
-          <Pressable style={[
-            styles.contentOption, 
-            navigationMode === 3 && styles.selectedOption]}
-            onPress = {() => setNavigationMode(3)}
-          >
-            <Text style={[styles.contentOptionText, navigationMode === 3 && styles.selectedOptionText]}>Nearby</Text>
-          </Pressable>
-
         </View>
       </View>
       
@@ -382,7 +363,6 @@ const styles = StyleSheet.create({
 
   //styling for the outfit container
   outfitContainer: {
-    flexGrow: 1, // Ensures the content can grow and overflow
     flexDirection: 'row',
     flexWrap: 'wrap', // Allow wrapping
     justifyContent: 'space-between', // Space out items

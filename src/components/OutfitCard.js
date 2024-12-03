@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
         borderRadius: 8,
         width: '48%', // Adjust the width to fit two items per row (slightly less than half the screen width)
+        minHeight: 282,
         marginBottom: 15,
         shadowOffset: { width: 0, height: 1 },  
         shadowColor: 'black',  

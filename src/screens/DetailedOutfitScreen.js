@@ -5,7 +5,7 @@ import {SafeAreaProvider, withSafeAreaInsets} from 'react-native-safe-area-conte
 import CustomStatusBar from '../components/CustomStatusBar';
 import { saveOutfitID } from '../utils/storage';
 
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
 const DetailedOutfitScreen = ({ route }) => {
@@ -52,20 +52,56 @@ const DetailedOutfitScreen = ({ route }) => {
         );
     }
 
+    //function that handles deletion
+    const deleteOutfit = async () => {
+      try {
+          const outfitRef = doc(db, 'users', userId, 'outfits', outfitId);
+          await deleteDoc(outfitRef);
+
+          //delete outfit images from imgur
+          if (outfit.images && Array.isArray(outfit.images)) {
+            for (const image of outfit.images) {
+                if (image.deletehash) {
+                    await deleteImageFromImgur(image.deletehash); // Delete the image from Imgur
+                }
+            }
+          }
+
+        //delete piece images from imgur
+        if (outfit.pieces && Array.isArray(outfit.pieces)) {
+          for (const piece of outfit.pieces) {
+              if (piece.image && piece.image.deletehash) {
+                  await deleteImageFromImgur(piece.image.deletehash); // Delete piece image from Imgur
+              }
+          }
+         }
+          
+          Alert.alert("Success", "Outfit deleted successfully!");
+          navigation.goBack(); // Navigate back after deletion
+      } catch (error) {
+          console.error("Error deleting outfit:", error);
+          Alert.alert("Error", "Failed to delete the outfit. Please try again.");
+      }
+  };
+
     return (
         <SafeAreaProvider style={styles.bigContainer}>
             <CustomStatusBar backgroundColor="white" />
 
             {/* ----------------------------header------------------------------*/}
             <View style={styles.header}>
-                <View style={styles.headerLeft}>
-                  <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Image
-                    source={require('../../assets/outfitCreationImages/back button.png')}
-                    style={styles.backButtonImage}
-                    />
-                </Pressable>
-                </View>
+              <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Image
+                source={require('../../assets/outfitCreationImages/back button.png')}
+                style={styles.backButtonImage}
+                />
+              </Pressable>
+              <Pressable onPress={deleteOutfit} style={styles.backButton}>
+                <Image
+                source={require('../../assets/OutfitDetailScreenImages/trash can.png')}
+                style={styles.backButtonImage}
+                />
+              </Pressable>
             </View>
 
             {/* ----------------------------ScrollView for images------------------------------*/}
@@ -148,8 +184,14 @@ const DetailedOutfitScreen = ({ route }) => {
                         )}
                       </View>
                       <View style={styles.pieceRight}>
-                        <Text style={styles.pieceTitle}>{piece.title || "Untitled Piece"}</Text>
-                        <Text style={styles.pieceLocation}>From: {piece.location || "Unknown Location"}</Text>
+                        <View>
+                          <Text style={styles.pieceTitle}>{piece.title || "Untitled Piece"}</Text>
+                          <Text style={styles.pieceLocation}>From: {piece.location || "Unknown Location"}</Text>
+                        </View>
+                        <Image
+                          source={require('../../assets/OutfitDetailScreenImages/map icon.png')} 
+                          style={styles.mapIcon}
+                        />
                       </View>
                     </Pressable>
                   ))}
@@ -172,11 +214,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-      },
-      //left side (arrow + "create outfit")
-      headerLeft: {
-        flexDirection: 'row',
         alignItems: 'center',
       },
       // outfit name at the top
@@ -282,8 +319,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   pieceRight: {
-    width: '60%',
-    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '65%',
     paddingRight: 20,
   },
   pieceTitle: {
@@ -297,6 +336,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666363',
   },
+  mapIcon: {
+    width: 25,
+    height: 25,
+  }
 });
 
 export default DetailedOutfitScreen;
