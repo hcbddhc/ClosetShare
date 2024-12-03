@@ -4,7 +4,6 @@ import Footer from '../components/Footer';
 import OutfitCard from '../components/OutfitCard';
 import DefaultButton from '../components/DefaultButton';
 import { getData, removeData } from '../utils/storage';
-import CustomStatusBar from '../components/CustomStatusBar';
 import { collection, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { useFocusEffect } from '@react-navigation/native';
@@ -143,7 +142,6 @@ const ProfileScreen = ({ navigation, onLoginStateChange }) => {
 
   return (
     <SafeAreaProvider style={styles.bigContainer}>
-        <CustomStatusBar backgroundColor="white" />
         <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -212,7 +210,7 @@ const ProfileScreen = ({ navigation, onLoginStateChange }) => {
                 : <Text style={styles.emptyText}>No posts yet.</Text>}
             </ScrollView>
         ) : (
-            <ScrollView style={styles.profileContent}>
+            <View style={styles.profileContent}>
                 {!editingState ? (
                 <>
                     <View style={styles.readOnlyField}>
@@ -325,7 +323,7 @@ const ProfileScreen = ({ navigation, onLoginStateChange }) => {
                     style={styles.logoutButton}
                     />
                 </View>
-            </ScrollView>
+            </View>
         )}
 
         {/* Footer */}
@@ -342,6 +340,7 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: '#FFFFFF',
+        paddingTop: 10,
         shadowOffset: { width: 0, height: 4 },
         shadowColor: 'black',
         shadowOpacity: 0.1,
@@ -361,7 +360,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        width: '80%',
+        width: '85%',
     },
     editingButton: {
         width: '100%', 
@@ -375,6 +374,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 140,
         borderRadius: 8, 
         alignItems: 'center', 
+        marginTop: 110,
     },
     logoutContainer: {
         marginBottom: 10,
@@ -435,6 +435,7 @@ const styles = StyleSheet.create({
         color: '#9D4EDD',
     },
     outfitContainer: {
+        flexGrow: 1,
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
@@ -446,6 +447,9 @@ const styles = StyleSheet.create({
         color: '#999',
     },
     profileContent: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     dropdown: {
         flex: 1,
@@ -500,8 +504,9 @@ const styles = StyleSheet.create({
         height: 40,
     },
     bigContainer: {
-        flex: 1,            // Take up the full screen
-        backgroundColor: '#fff',  // Set background color
+        flex: 1,   
+        backgroundColor: '#fff', 
+        paddingTop: 40,
     },
       
 });
