@@ -60,7 +60,7 @@ const DetailedOutfitScreen = ({ route }) => {
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
                 <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Image source={require('../../assets/outfitCreationImages/back button.png')} />
+                    <Image style={styles.backButton} source={require('../../assets/outfitCreationImages/back button.png')} />
                 </Pressable>
                 </View>
             </View>
@@ -85,7 +85,7 @@ const DetailedOutfitScreen = ({ route }) => {
                     source={require('../../assets/HomeScreenImages/Profile Icon.png')} 
                     style={styles.profileIcon}
                   />
-                  <Text style={styles.outputText}>{userName}</Text>
+                  <Text style={styles.usernameText}>{userName}</Text>
                 </View>
                 {/* --------Description Field----------*/}
                 <View style={styles.outputRow}>
@@ -178,9 +178,12 @@ const styles = StyleSheet.create({
       },
       // outfit name at the top
       h1: {
+        fontFamily: 'Poppins_600SemiBold',
         fontSize: 24,
-        color: '#666363',
-        marginBottom: 5,
+      },
+      backButton: {
+        width: 25,
+        height: 25,
       },
 
       //--------------------------add image section (where user add outfit image)-----------------------------
@@ -190,7 +193,6 @@ const styles = StyleSheet.create({
   imageView: { //View that contains the whole image section
     flexDirection: 'row',
     alignContent: 'center',
-    marginTop: 10,
   },
   imageScrollContainer: { //for the scrollView that contains all the images
     flexDireciton: 'row',
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
   imageFrame: { //for the pressable that contains the images
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 20,
+    marginHorizontal: 5,
   },
   outfitImage: { // For actual image
     width: 339,
@@ -208,11 +210,18 @@ const styles = StyleSheet.create({
   },
   //-----------------------------content section-----------------------------
   content: {
-    marginHorizontal: 22,
+    marginHorizontal: 10,
     marginBottom: 20,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
+    shadowOffset: { width: 0, height: 0.5 },  
+    shadowColor: 'black',  
+    shadowOpacity: 0.2,  
+    elevation: 2, 
   },
   outputRow: {
-    marginBottom: 10,
+    marginBottom: 20,
   },
   flexRow: {
     flexDirection: 'row',
@@ -221,15 +230,20 @@ const styles = StyleSheet.create({
   },
   usernameRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 20,
+  },
+  usernameText: {
+    fontFamily: 'Poppins_600SemiBold',
+    color: '#9D4EDD',
   },
   captionText: {
     fontSize: 12,
     color: '#9D4EDD',
+    fontFamily: 'Nunito_400Regular',
     marginBottom: 5,
   },
   outputText: {
+    fontFamily: 'Nunito_400Regular',
     paddingBottom: 5,
     fontSize: 14,
   },
@@ -255,8 +269,8 @@ const styles = StyleSheet.create({
     width: '35%',
   },
   pieceImage: {
-    width: 113,
-    height: 94,
+    width: 110,
+    height: 90,
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
   },
@@ -269,30 +283,13 @@ const styles = StyleSheet.create({
     color: '#9D4EDD',
     fontSize: 16,
     marginBottom: 10,
+    fontFamily: 'Nunito_800ExtraBold',
   },
   pieceLocation: {
     paddingBottom: 5,
     fontSize: 14,
     color: '#666363',
   },
-  addPieceButton: {
-  marginTop: 20,
-  paddingVertical: 10,
-  paddingHorizontal: 15,
-  backgroundColor: '#9D4EDD',
-  borderRadius: 8,
-  alignItems: 'center',
-  justifyContent: 'center',
-  shadowOffset: { width: 0, height: 2 },
-  shadowColor: 'black',
-  shadowOpacity: 0.2,
-  elevation: 5,
-},
-addPieceButtonText: {
-  color: 'white',
-  fontSize: 16,
-  fontWeight: '600',
-},
 });
 
 export default DetailedOutfitScreen;

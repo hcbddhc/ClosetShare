@@ -286,7 +286,7 @@ const handleImageResult = async (result, uploadOption, imageIndex) => {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Pressable onPress={() => navigation.navigate('Home')}>
-            <Image source={require('../../assets/outfitCreationImages/back button.png')} />
+            <Image style={styles.backButton} source={require('../../assets/outfitCreationImages/back button.png')} />
           </Pressable>
           <Text style={styles.h1}>Create Outfit</Text>
         </View>
@@ -468,8 +468,8 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#FFFFFF',
     paddingTop: 20,
-    paddingBottom: 20,
-    paddingHorizontal: 30,
+    paddingBottom: 10,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -499,6 +499,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Poppins_500Medium',
     color: '#666363',
+  },
+
+  //for the back button
+  backButton: {
+    width: 25,
+    height: 25,
+    marginRight: 10,
   },
 
   //--------------------------add image section (where user add outfit image)-----------------------------
